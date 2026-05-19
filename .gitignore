@@ -1,10 +1,8 @@
 .terraform.lock.hcl
 .terraform.tfstate.lock.info
 LICENSE.txt
-terraform-provider-aws_v6.33.0_x5.exe
 terraform.tfvars
 terraform.tfstate.backup
 terraform.tfstate
 .terraform/
-aws/
 providers/
