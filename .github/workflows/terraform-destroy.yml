@@ -1,0 +1,38 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      PROJECT_NUMBER: ${{ secrets.PROJECT_NUMBER }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create tfvars file
+        run: |
+         cat <<EOF > terraform.tfvars
+         endpoint = "${{ secrets.ENDPOINT }}"
+         application_key = "${{ secrets.APPLICATION_KEY }}"
+         application_secret = "${{ secrets.APPLICATION_SECRET }}"
+         consumer_key = "${{ secrets.CONSUMER_KEY }}"
+         EOF
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve 
