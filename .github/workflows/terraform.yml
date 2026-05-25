@@ -21,6 +21,8 @@ jobs:
          application_key = "${{ secrets.APPLICATION_KEY }}"
          application_secret = "${{ secrets.APPLICATION_SECRET }}"
          consumer_key = "${{ secrets.CONSUMER_KEY }}"
+         ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
+         region = "${{ secrets.REGION }}"
          EOF
 
       
