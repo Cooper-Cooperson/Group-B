@@ -33,3 +33,15 @@ variable keycloak_admin_password {
 variable keycloak_hostname {
   type = string
 }
+
+variable keycloak_admin_user {
+  type = string
+}
+
+variable keycloak_admin_password {
+  type = string
+}
+
+variable keycloak_url {
+  type = string
+}
