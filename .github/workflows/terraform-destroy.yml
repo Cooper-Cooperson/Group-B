@@ -41,7 +41,7 @@ jobs:
           keycloak_url = "https://${{ secrets.KEYCLOAK_HOSTNAME }}/"
           domain = "${{ secrets.DOMAIN }}"
           ssh_keypair_name = "${{ secrets.SSH_KEYPAIR_NAME }}"
-          admin_ip_whitelist = ${{ secrets.ADMIN_IP_WHITELIST }}
+          admin_ip_whitelist = "${{ secrets.ADMIN_IP_WHITELIST }}"
           EOF
 
       - name: Setup Terraform
