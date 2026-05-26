@@ -13,3 +13,15 @@ variable application_secret {
 variable consumer_key {
   type = string
 }
+
+variable ovh_project_id {
+  type = string
+}
+
+variable region {
+  type = string
+}
+
+variable kube_oidc_client_id {
+  type = string
+}
