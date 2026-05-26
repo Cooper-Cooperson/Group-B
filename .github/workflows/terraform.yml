@@ -42,9 +42,6 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        
-      - name: port-forward  
-        run: kubectl port-forward svc/keycloak -n keycloak 8080:80
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan

@@ -35,8 +35,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
         
-      - name: port-forward  
-        run: kubectl port-forward svc/keycloak -n keycloak 8080:80  
-        
       - name: Terraform Destroy
         run: terraform destroy -auto-approve 
