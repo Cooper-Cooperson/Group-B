@@ -159,7 +159,7 @@ resource "helm_release" "keycloak" {
 }
 
 provider "keycloak" {
-  url      = "http://keycloak.keycloak.svc.cluster.local:8080/"
+  url      = "http://localhost:8080/"
   realm    = "master"
   client_id = "admin"
   username  = var.keycloak_admin_user
