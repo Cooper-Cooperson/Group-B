@@ -21,7 +21,3 @@ variable ovh_project_id {
 variable region {
   type = string
 }
-
-variable kube_oidc_client_id {
-  type = string
-}
