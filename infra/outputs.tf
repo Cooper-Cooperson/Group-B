@@ -28,11 +28,12 @@ DNS Nameservers — Point your domain registrar to these
 Only relevant if the domain was recently transferred to OVHcloud.
 -----------------------------------------------------------------------------
 */
+/*
 output "dns_nameservers" {
   description = "OVHcloud authoritative nameservers for the domain zone"
   value       = data.ovh_domain_zone.main.name_servers
 }
-
+*/
 /*
 -----------------------------------------------------------------------------
 Service URLs — Quick reference for all deployed services
@@ -51,6 +52,7 @@ output "service_urls" {
 DNS Records — Verification output (subdomain → IP mapping)
 -----------------------------------------------------------------------------
 */
+/*
 output "dns_records" {
   description = "DNS A-records created (FQDN → target IP)"
   value = {
@@ -58,7 +60,7 @@ output "dns_records" {
     "${subdomain}.${var.domain}" => record.target
   }
 }
-
+*/
 /*
 -----------------------------------------------------------------------------
 Firewall Status — Confirm the firewall is active
