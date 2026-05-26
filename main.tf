@@ -161,11 +161,9 @@ resource "helm_release" "keycloak" {
 provider "keycloak" {
   url      = "https://${var.keycloak_hostname}/"
   realm    = "master"
-  client_id = "my-app"
+  client_id = "admin"
   username  = var.keycloak_admin_user
   password  = var.keycloak_admin_password_for_provider
-  # Wait till Keycloak is reachable.
-  depends_on = [helm_release.keycloak]
 }
 
 resource "keycloak_realm" "apps" {
@@ -196,14 +194,24 @@ resource "keycloak_openid_client" "my_app" {
   # Optional: fine‑grained settings (PKCE, logout URLs, etc.)
 }
 
+resource "keycloak_openid_client" "kube" {
+  realm_id  = keycloak_realm.apps.id
+  client_id = user
+  name      = "Kubernetes API"
+  access_type = "PUBLIC"
 
+  standard_flow_enabled = true
+  direct_access_grants_enabled = false
+
+  valid_redirect_uris = ["*"]
+}
 
 # Open ID connect (OIDC)
 resource "ovh_cloud_project_kube_oidc" "keycloak_oidc" {
   service_name = ovh_cloud_project_kube.cluster.service_name
   kube_id      = ovh_cloud_project_kube.cluster.id
 
-  client_id    = var.kube_oidc_client_id
+  client_id    = user
   issuer_url = "https://${var.keycloak_hostname}/realms/${keycloak_realm.apps.realm}"
 
   oidc_username_claim = "preferred_username"
