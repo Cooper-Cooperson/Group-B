@@ -21,15 +21,3 @@ variable ovh_project_id {
 variable region {
   type = string
 }
-
-variable keycloak_admin_user {
-  type = string
-}
-
-variable keycloak_admin_password {
-  type = string
-}
-
-variable keycloak_hostname {
-  type = string
-}
