@@ -1,4 +1,4 @@
-# =============================================================================
+/* =============================================================================
 # Escaping Microsoft — Main Terraform Configuration
 # =============================================================================
 # Provisions the complete network and security infrastructure on OVHcloud
@@ -12,11 +12,11 @@
 # CI/CD: Deployed via GitHub Actions (Cooper-Cooperson/Group-B)
 #        Secrets injected as TF_VAR_* environment variables.
 # =============================================================================
-
 # -----------------------------------------------------------------------------
 # Terraform Settings & Provider Requirements
 # Using ONLY the official ovh/ovh provider for all resources.
 # -----------------------------------------------------------------------------
+*/
 terraform {
   required_version = ">= 1.6.0"
 
@@ -36,11 +36,12 @@ terraform {
   }
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # OVH Provider — Authenticated via GitHub Actions secrets
 # Manages: DNS zones, cloud instances, IP firewalls
 # Docs: https://registry.terraform.io/providers/ovh/ovh/latest/docs
 # -----------------------------------------------------------------------------
+*/
 provider "ovh" {
   endpoint           = var.endpoint
   application_key    = var.application_key
@@ -48,7 +49,7 @@ provider "ovh" {
   consumer_key       = var.consumer_key
 }
 
-# =============================================================================
+/* =============================================================================
 #  SECTION 1: COMPUTE INSTANCE
 # =============================================================================
 # Single-node server running the entire stack via Docker Compose:
@@ -59,6 +60,7 @@ provider "ovh" {
 #   • Jitsi Meet   (meet.<domain>)   — Video conferencing
 #   • Traefik/Nginx                  — Reverse proxy + TLS termination
 # =============================================================================
+*/
 
 resource "ovh_cloud_project_instance" "server" {
   service_name   = var.ovh_project_id
@@ -91,7 +93,7 @@ locals {
   ][0]
 }
 
-# =============================================================================
+/* =============================================================================
 #  SECTION 2: IP FIREWALL (Ingress Rules)
 # =============================================================================
 # OVH IP Firewall operates at the OVH network edge (before traffic reaches
@@ -116,7 +118,7 @@ locals {
 # by default — no egress rules needed (system updates, SMTP out, API calls
 # all work without additional configuration).
 # =============================================================================
-
+*/
 # Enable the IP Firewall on the server's public IP
 resource "ovh_ip_firewall" "server" {
   ip             = local.public_ipv4
@@ -124,11 +126,12 @@ resource "ovh_ip_firewall" "server" {
   enabled        = true
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 0–4: SSH (Port 22/TCP) — Admin IP Whitelist Only
 # Each admin IP gets its own rule with a unique sequence number.
 # Controlled by var.admin_ip_whitelist (max 5 entries, validated).
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "ssh_admin" {
   for_each = { for idx, cidr in var.admin_ip_whitelist : tostring(idx) => cidr }
 
@@ -143,11 +146,12 @@ resource "ovh_ip_firewall_rule" "ssh_admin" {
   source           = each.value # e.g., "203.0.113.42/32"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 5: HTTP (Port 80/TCP) — Open to All
 # Used by: Nextcloud, Keycloak, Mattermost, Jitsi web UI
 # Also required for Let's Encrypt ACME HTTP-01 challenge validation.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "http" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -159,11 +163,12 @@ resource "ovh_ip_firewall_rule" "http" {
   destination_port = "80"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 6: HTTPS (Port 443/TCP) — Open to All
 # Primary entry point for all web services behind the reverse proxy.
 # Handles TLS-encrypted traffic for all subdomains.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "https" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -175,11 +180,12 @@ resource "ovh_ip_firewall_rule" "https" {
   destination_port = "443"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 7: SMTP (Port 25/TCP) — Open to All
 # Inbound email delivery. Mailcow must receive mail from any MTA on the
 # internet. Blocking this would prevent receiving emails entirely.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "smtp" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -191,11 +197,12 @@ resource "ovh_ip_firewall_rule" "smtp" {
   destination_port = "25"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 8: SMTPS (Port 465/TCP) — Open to All
 # Implicit TLS for mail submission from email clients (Thunderbird, etc.).
 # Users connect from any network, so this must be publicly accessible.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "smtps" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -207,11 +214,12 @@ resource "ovh_ip_firewall_rule" "smtps" {
   destination_port = "465"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 9: Submission (Port 587/TCP) — Open to All
 # STARTTLS mail submission from email clients. Standard port for
 # authenticated outbound email from user mail apps.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "submission" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -223,11 +231,12 @@ resource "ovh_ip_firewall_rule" "submission" {
   destination_port = "587"
 }
 
-# -----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 # Seq 10: IMAP (Port 143/TCP) — Open to All
 # Plaintext/STARTTLS IMAP for email client access.
 # Users connect from various networks (home, mobile, etc.).
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "imap" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -239,11 +248,12 @@ resource "ovh_ip_firewall_rule" "imap" {
   destination_port = "143"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 11: IMAPS (Port 993/TCP) — Open to All
 # Implicit TLS IMAP — the secure, recommended protocol for email clients.
 # Should be preferred over port 143 by all modern clients.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "imaps" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -255,12 +265,13 @@ resource "ovh_ip_firewall_rule" "imaps" {
   destination_port = "993"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 12: Jitsi WebRTC (Port 10000/UDP) — Open to All
 # Used by Jitsi Videobridge (JVB) for real-time video/audio media streams.
 # MUST be UDP for acceptable latency in video conferencing.
 # Participants join from any network.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "jitsi_webrtc" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -272,7 +283,7 @@ resource "ovh_ip_firewall_rule" "jitsi_webrtc" {
   destination_port = "10000"
 }
 
-# -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
 # Seq 19: Default DENY — Catch-All for TCP
 # Implements least-privilege: any TCP traffic not explicitly permitted above
 # is denied at the OVH network edge.
@@ -282,6 +293,7 @@ resource "ovh_ip_firewall_rule" "jitsi_webrtc" {
 # allowed automatically. This deny rule only blocks NEW unsolicited inbound
 # TCP connections on non-permitted ports.
 # -----------------------------------------------------------------------------
+*/
 resource "ovh_ip_firewall_rule" "deny_all_tcp" {
   depends_on = [ovh_ip_firewall.server]
 
@@ -292,7 +304,7 @@ resource "ovh_ip_firewall_rule" "deny_all_tcp" {
   sequence       = 19
 }
 
-# =============================================================================
+/* =============================================================================
 #  SECTION 3: DNS A-RECORDS
 # =============================================================================
 # Maps each service subdomain to the server's public IPv4 address.
@@ -311,7 +323,7 @@ resource "ovh_ip_firewall_rule" "deny_all_tcp" {
 #   chat.<domain>   → Mattermost (Team Chat)
 #   meet.<domain>   → Jitsi Meet (Video Conferencing)
 # =============================================================================
-
+*/
 resource "ovh_domain_zone_record" "services" {
   for_each = var.subdomains
 
