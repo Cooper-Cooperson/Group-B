@@ -159,7 +159,7 @@ resource "helm_release" "keycloak" {
 }
 
 provider "keycloak" {
-  url      = "https://${var.keycloak_hostname}/"
+  url      = "http://keycloak.keycloak.svc.cluster.local:8080/"
   realm    = "master"
   client_id = "admin"
   username  = var.keycloak_admin_user
@@ -167,6 +167,7 @@ provider "keycloak" {
 }
 
 resource "keycloak_realm" "apps" {
+  depends_on = [helm_release.keycloak]
   realm        = "apps"
   enabled      = true
   display_name = "Apps Realm"
