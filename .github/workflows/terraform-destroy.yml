@@ -24,6 +24,9 @@ jobs:
          consumer_key = "${{ secrets.CONSUMER_KEY }}"
          ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
          region = "${{ secrets.REGION }}"
+         keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
+         keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
+         keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
          EOF
 
       - name: Setup Terraform

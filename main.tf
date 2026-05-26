@@ -163,7 +163,7 @@ provider "keycloak" {
   realm    = "master"
   client_id = "admin"
   username  = var.keycloak_admin_user
-  password  = var.keycloak_admin_password_for_provider
+  password  = var.keycloak_admin_password
 }
 
 resource "keycloak_realm" "apps" {
