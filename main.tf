@@ -196,7 +196,7 @@ resource "keycloak_openid_client" "my_app" {
 
 resource "keycloak_openid_client" "kube" {
   realm_id  = keycloak_realm.apps.id
-  client_id = user
+  client_id = "user"
   name      = "Kubernetes API"
   access_type = "PUBLIC"
 
@@ -211,7 +211,7 @@ resource "ovh_cloud_project_kube_oidc" "keycloak_oidc" {
   service_name = ovh_cloud_project_kube.cluster.service_name
   kube_id      = ovh_cloud_project_kube.cluster.id
 
-  client_id    = user
+  client_id    = "user"
   issuer_url = "https://${var.keycloak_hostname}/realms/${keycloak_realm.apps.realm}"
 
   oidc_username_claim = "preferred_username"
