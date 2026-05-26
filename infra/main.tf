@@ -24,10 +24,29 @@ provider "ovh" {
   consumer_key       = var.consumer_key
 }
 
+resource "ovh_cloud_project_network_private" "mks_net" {
+  service_name = var.ovh_project_id
+  name         = "mks-private-network"
+  vlan_id      = 0
+}
+
+resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {
+  service_name = var.ovh_project_id
+  network_id   = ovh_cloud_project_network_private.mks_net.id
+
+  start = "192.168.10.10"
+  end   = "192.168.10.250"
+  network = "192.168.10.0/24"
+  dhcp    = true
+}
+
 resource "ovh_cloud_project_kube" "cluster" {
   service_name = var.ovh_project_id
   name         = "mks-keycloak"
   region       = var.region
+  
+  private_network_id = ovh_cloud_project_network_private.mks_net.id
+  nodes_subnet_id    = ovh_cloud_project_network_private_subnet.mks_subnet.id
 }
 
 resource "ovh_cloud_project_kube_nodepool" "pool" {
