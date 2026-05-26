@@ -1,24 +1,27 @@
-/* ============================================================================= */
-/* Escaping Microsoft — Input Variables */
-/* ============================================================================= */
-/* These variables are injected by GitHub Actions via TF_VAR_<name> environment */
-/* variables, sourced from repository secrets in Cooper-Cooperson/Group-B. */
-/* */
-/* CI/CD Mapping: */
-/*   GitHub Secret          → TF_VAR_                → Terraform Variable */
-/*   APPLICATION_KEY        → TF_VAR_application_key        → var.application_key */
-/*   APPLICATION_SECRET     → TF_VAR_application_secret     → var.application_secret */
-/*   CONSUMER_KEY           → TF_VAR_consumer_key           → var.consumer_key */
-/*   ENDPOINT               → TF_VAR_endpoint               → var.endpoint */
-/*   OVH_PROJECT_ID         → TF_VAR_ovh_project_id         → var.ovh_project_id */
-/*   REGION                 → TF_VAR_region                  → var.region */
-/* ============================================================================= */
+/*
+=============================================================================
+Escaping Microsoft — Input Variables
+=============================================================================
+These variables are injected by GitHub Actions via TF_VAR_<name> environment
+variables, sourced from repository secrets in Cooper-Cooperson/Group-B.
+CI/CD Mapping:
+GitHub Secret          → TF_VAR_                → Terraform Variable
+APPLICATION_KEY        → TF_VAR_application_key        → var.application_key
+APPLICATION_SECRET     → TF_VAR_application_secret     → var.application_secret
+CONSUMER_KEY           → TF_VAR_consumer_key           → var.consumer_key
+ENDPOINT               → TF_VAR_endpoint               → var.endpoint
+OVH_PROJECT_ID         → TF_VAR_ovh_project_id         → var.ovh_project_id
+REGION                 → TF_VAR_region                  → var.region
+=============================================================================
+*/
 
-/* ----------------------------------------------------------------------------- */
-/* OVH API Credentials (injected by GitHub Actions) */
-/* These authenticate Terraform against the OVH API for DNS and firewall mgmt. */
-/* Generate at: https://api.ovh.com/createToken/ */
-/* ----------------------------------------------------------------------------- */
+/*
+-----------------------------------------------------------------------------
+OVH API Credentials (injected by GitHub Actions)
+These authenticate Terraform against the OVH API for DNS and firewall mgmt.
+Generate at: https://api.ovh.com/createToken/
+-----------------------------------------------------------------------------
+*/
 variable "application_key" {
   description = "OVH API application key (GitHub secret: APPLICATION_KEY)"
   type        = string
@@ -43,9 +46,11 @@ variable "endpoint" {
   default     = "ovh-eu"
 }
 
-/* ----------------------------------------------------------------------------- */
-/* OVH Public Cloud Project (injected by GitHub Actions) */
-/* ----------------------------------------------------------------------------- */
+/*
+-----------------------------------------------------------------------------
+OVH Public Cloud Project (injected by GitHub Actions)
+-----------------------------------------------------------------------------
+*/
 variable "ovh_project_id" {
   description = "OVH Public Cloud project ID (GitHub secret: OVH_PROJECT_ID)"
   type        = string
@@ -57,13 +62,15 @@ variable "region" {
   default     = "GRA11"
 }
 
-/* ----------------------------------------------------------------------------- */
-/* Compute Instance Configuration */
-/* These can be set as additional GitHub secrets or have sensible defaults. */
-/* Sizing for 50-100 users running the full open-source stack: */
-/*   b2-30  (8 vCPU, 30 GB RAM)  — recommended for production */
-/*   b2-15  (4 vCPU, 15 GB RAM)  — minimum viable option */
-/* ----------------------------------------------------------------------------- */
+/*
+-----------------------------------------------------------------------------
+Compute Instance Configuration
+These can be set as additional GitHub secrets or have sensible defaults.
+Sizing for 50-100 users running the full open-source stack:
+b2-30  (8 vCPU, 30 GB RAM)  — recommended for production
+b2-15  (4 vCPU, 15 GB RAM)  — minimum viable option
+-----------------------------------------------------------------------------
+*/
 variable "instance_name" {
   description = "Hostname for the compute instance"
   type        = string
@@ -87,11 +94,13 @@ variable "ssh_keypair_name" {
   type        = string
 }
 
-/* ----------------------------------------------------------------------------- */
-/* DNS / Domain Configuration */
-/* The root domain must already be registered and managed via OVHcloud DNS. */
-/* Set as a GitHub secret or TF_VAR_domain in your workflow. */
-/* ----------------------------------------------------------------------------- */
+/*
+-----------------------------------------------------------------------------
+DNS / Domain Configuration
+The root domain must already be registered and managed via OVHcloud DNS.
+Set as a GitHub secret or TF_VAR_domain in your workflow.
+-----------------------------------------------------------------------------
+*/
 variable "domain" {
   description = "Root domain name managed in OVHcloud DNS (e.g., suitit.nl)"
   type        = string
@@ -103,7 +112,9 @@ variable "dns_ttl" {
   default     = 3600
 }
 
-/* Service subdomains — add new services here (one-line change) */
+/*
+Service subdomains — add new services here (one-line change)
+*/
 variable "subdomains" {
   description = "Map of service subdomains to their description (used for DNS A-records)"
   type        = map(string)
@@ -116,13 +127,15 @@ variable "subdomains" {
   }
 }
 
-/* ----------------------------------------------------------------------------- */
-/* Firewall — Admin SSH Access Whitelist */
-/* IMPORTANT: Restrict SSH to known admin IPs only (principle of least privilege). */
-/* Max 5 entries — the OVH IP Firewall supports 20 rules total; 5 are reserved */
-/* for SSH and the rest for service ports. */
-/* Set as TF_VAR_admin_ip_whitelist='["x.x.x.x/32"]' in your GitHub workflow. */
-/* ----------------------------------------------------------------------------- */
+/*
+-----------------------------------------------------------------------------
+Firewall — Admin SSH Access Whitelist
+IMPORTANT: Restrict SSH to known admin IPs only (principle of least privilege).
+Max 5 entries — the OVH IP Firewall supports 20 rules total; 5 are reserved
+for SSH and the rest for service ports.
+Set as TF_VAR_admin_ip_whitelist='["x.x.x.x/32"]' in your GitHub workflow.
+-----------------------------------------------------------------------------
+*/
 variable "admin_ip_whitelist" {
   description = <<-EOT
     List of CIDR blocks allowed SSH access (port 22).
