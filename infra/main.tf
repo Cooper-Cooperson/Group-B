@@ -33,7 +33,7 @@ resource "ovh_cloud_project_network_private" "mks_net" {
 resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {
   service_name = var.ovh_project_id
   network_id   = ovh_cloud_project_network_private.mks_net.id
-
+  region       = var.region
   start = "192.168.10.10"
   end   = "192.168.10.250"
   network = "192.168.10.0/24"
@@ -44,7 +44,7 @@ resource "ovh_cloud_project_kube" "cluster" {
   service_name = var.ovh_project_id
   name         = "mks-keycloak"
   region       = var.region
-  
+
   private_network_id = ovh_cloud_project_network_private.mks_net.id
   nodes_subnet_id    = ovh_cloud_project_network_private_subnet.mks_subnet.id
 }
