@@ -1,22 +1,38 @@
+# =============================================================================
+# Escaping Microsoft — Main Terraform Configuration
+# =============================================================================
+# Provisions the complete network and security infrastructure on OVHcloud
+# for a self-hosted Microsoft 365 replacement (50-100 users).
+#
+# Resources provisioned:
+#   1. Compute instance   (ovh_cloud_project_instance)
+#   2. IP Firewall        (ovh_ip_firewall + ovh_ip_firewall_rule)
+#   3. DNS A-records      (ovh_domain_zone_record)
+#
+# CI/CD: Deployed via GitHub Actions (Cooper-Cooperson/Group-B)
+#        Secrets injected as TF_VAR_* environment variables.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Terraform Settings & Provider Requirements
+# Using ONLY the official ovh/ovh provider for all resources.
+# -----------------------------------------------------------------------------
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.5.0"
 
   required_providers {
     ovh = {
-      source = "ovh/ovh"
-      version = ">= 2.1.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.29"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.13"
+      source  = "ovh/ovh"
+      version = ">= 2.13.0"
     }
   }
 }
 
+# -----------------------------------------------------------------------------
+# OVH Provider — Authenticated via GitHub Actions secrets
+# Manages: DNS zones, cloud instances, IP firewalls
+# Docs: https://registry.terraform.io/providers/ovh/ovh/latest/docs
+# -----------------------------------------------------------------------------
 provider "ovh" {
   endpoint           = var.endpoint
   application_key    = var.application_key
@@ -33,7 +49,7 @@ resource "ovh_cloud_project_network_private" "mks_net" {
 resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {
   service_name = var.ovh_project_id
   network_id   = ovh_cloud_project_network_private.mks_net.id
-  region       = var.region
+
   start = "192.168.10.10"
   end   = "192.168.10.250"
   network = "192.168.10.0/24"
@@ -44,7 +60,7 @@ resource "ovh_cloud_project_kube" "cluster" {
   service_name = var.ovh_project_id
   name         = "mks-keycloak"
   region       = var.region
-
+  
   private_network_id = ovh_cloud_project_network_private.mks_net.id
   nodes_subnet_id    = ovh_cloud_project_network_private_subnet.mks_subnet.id
 }
