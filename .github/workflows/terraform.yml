@@ -1,6 +1,15 @@
 name: Terraform
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: "Which stack to deploy?"
+        required: true
+        type: choice
+        options:
+          - infra
+          - keycloak
 
 permissions:
   id-token: write
@@ -9,39 +18,46 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-      
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select stack
+        run: echo "STACK=${{ github.event.inputs.stack }}" >> $GITHUB_ENV
+
       - name: Create tfvars file
         run: |
-         cat <<EOF > terraform.tfvars
-         endpoint = "${{ secrets.ENDPOINT }}"
-         application_key = "${{ secrets.APPLICATION_KEY }}"
-         application_secret = "${{ secrets.APPLICATION_SECRET }}"
-         consumer_key = "${{ secrets.CONSUMER_KEY }}"
-         ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
-         region = "${{ secrets.REGION }}"
-         keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
-         keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
-         keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
-         EOF
+          cat <<EOF > $STACK/terraform.tfvars
+          endpoint = "${{ secrets.ENDPOINT }}"
+          application_key = "${{ secrets.APPLICATION_KEY }}"
+          application_secret = "${{ secrets.APPLICATION_SECRET }}"
+          consumer_key = "${{ secrets.CONSUMER_KEY }}"
+          ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
+          region = "${{ secrets.REGION }}"
+          keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
+          keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
+          keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
+          keycloak_url = "https://${{ secrets.KEYCLOAK_HOSTNAME }}/"
+          EOF
 
-      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-            terraform_wrapper: false  
+          terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init 
+        working-directory: ${{ env.STACK }}
+        run: terraform init
 
       - name: Terraform Validate
+        working-directory: ${{ env.STACK }}
         run: terraform validate
 
       - name: Terraform Plan
+        working-directory: ${{ env.STACK }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
+        working-directory: ${{ env.STACK }}
         run: terraform apply -auto-approve tfplan

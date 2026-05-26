@@ -2,6 +2,14 @@ name: Terraform Destroy
 
 on:
   workflow_dispatch:
+    inputs:
+      stack:
+        description: "Which stack to destroy?"
+        required: true
+        type: choice
+        options:
+          - infra
+          - keycloak
 
 permissions:
   id-token: write
@@ -15,25 +23,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select stack
+        run: echo "STACK=${{ github.event.inputs.stack }}" >> $GITHUB_ENV
+
       - name: Create tfvars file
         run: |
-         cat <<EOF > terraform.tfvars
-         endpoint = "${{ secrets.ENDPOINT }}"
-         application_key = "${{ secrets.APPLICATION_KEY }}"
-         application_secret = "${{ secrets.APPLICATION_SECRET }}"
-         consumer_key = "${{ secrets.CONSUMER_KEY }}"
-         ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
-         region = "${{ secrets.REGION }}"
-         keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
-         keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
-         keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
-         EOF
+          cat <<EOF > $STACK/terraform.tfvars
+          endpoint = "${{ secrets.ENDPOINT }}"
+          application_key = "${{ secrets.APPLICATION_KEY }}"
+          application_secret = "${{ secrets.APPLICATION_SECRET }}"
+          consumer_key = "${{ secrets.CONSUMER_KEY }}"
+          ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
+          region = "${{ secrets.REGION }}"
+          keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
+          keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
+          keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
+          keycloak_url = "https://${{ secrets.KEYCLOAK_HOSTNAME }}/"
+          EOF
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
+        working-directory: ${{ env.STACK }}
         run: terraform init
-        
+
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve 
+        working-directory: ${{ env.STACK }}
+        run: terraform destroy -auto-approve
