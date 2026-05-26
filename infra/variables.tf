@@ -154,3 +154,15 @@ variable "admin_ip_whitelist" {
     error_message = "Maximum 5 admin IPs supported (OVH IP Firewall has a 20-rule limit)."
   }
 }
+
+variable keycloak_admin_user {
+  type = string
+}
+
+variable keycloak_admin_password {
+  type = string
+}
+
+variable keycloak_hostname {
+  type = string
+}
