@@ -60,6 +60,12 @@ jobs:
           echo "OS_PASSWORD=${{ secrets.APPLICATION_SECRET }}" >> $GITHUB_ENV
           echo "OS_REGION_NAME=${{ secrets.BUCKET_REGION }}" >> $GITHUB_ENV
 
+      - name: Export S3 credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_DEFAULT_REGION=${{ secrets.BUCKET_REGION }}" >> $GITHUB_ENV
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
