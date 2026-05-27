@@ -139,8 +139,8 @@ Set as TF_VAR_admin_ip_whitelist='["x.x.x.x/32"]' in your GitHub workflow.
 variable "admin_ip_whitelist" {
   description = "
     List of CIDR blocks allowed SSH access (port 22).
-    Example: ["203.0.113.10/32", "198.51.100.0/24"]
-    WARNING: Never set this to ["0.0.0.0/0"] in production!
+    Example: ['203.0.113.10/32', '198.51.100.0/24']
+    WARNING: Never set this to ['0.0.0.0/0'] in production!
   "
   type        = list(string)
 
