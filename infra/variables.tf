@@ -200,25 +200,15 @@ Keycloak Configuration (injected by GitHub Actions)
 Used by the Helm chart to configure the Keycloak admin account and ingress.
 -----------------------------------------------------------------------------
 */
-variable "keycloak_admin_user" {
-  description = "Keycloak admin username (GitHub secret: KEYCLOAK_ADMIN_USER)"
-  type        = string
-  default     = "admin"
+
+variable keycloak_admin_user {
+  type = string
 }
 
-variable "keycloak_admin_password" {
-  description = "Keycloak admin password (GitHub secret: KEYCLOAK_ADMIN_PASSWORD) — NEVER hardcode!"
-  type        = string
-  sensitive   = true
+variable keycloak_admin_password {
+  type = string
 }
 
-variable "keycloak_hostname" {
-  description = "FQDN for the Keycloak ingress (e.g., auth.suitit.nl)"
-  type        = string
-}
-
-variable "keycloak_url" {
-  description = "Full Keycloak URL (written by workflow, unused by infra stack)"
-  type        = string
-  default     = ""
+variable keycloak_hostname {
+  type = string
 }
