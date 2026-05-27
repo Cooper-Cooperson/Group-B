@@ -70,7 +70,7 @@ resource "ovh_cloud_project_instance" "server" {
   billing_period = "monthly"
 
   flavor {
-    flavor_id = var.instance_flavor
+    flavor_id = var.instance_image
   }
 
   boot_from {
@@ -358,7 +358,7 @@ temporary private network
 resource "ovh_cloud_project_network_private" "mks_net" {
   service_name = var.ovh_project_id
   name         = "mks-private-network"
-  vlan_id      = 0
+  vlan_id      = 2
   regions = [var.region]
 }
 
