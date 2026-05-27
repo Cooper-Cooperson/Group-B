@@ -70,7 +70,7 @@ resource "ovh_cloud_project_instance" "server" {
   billing_period = "monthly"
 
   flavor {
-    flavor_id = var.instance_image
+    flavor_id = var.instance_flavor
   }
 
   boot_from {

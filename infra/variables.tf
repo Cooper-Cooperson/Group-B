@@ -67,9 +67,7 @@ variable "ovh_project_id" {
 }
 
 variable "region" {
-  description = "OVHcloud datacenter region, e.g. GRA11, SBG5, DE1 (GitHub secret: REGION)"
   type        = string
-  default     = "GRA11"
 }
 
 /*
@@ -122,13 +120,13 @@ variable "instance_name" {
 variable "instance_flavor" {
   description = "OVHcloud instance flavor ID (e.g., b2-15, b2-30, b2-60)"
   type        = string
-  default     = "b2-30"
+  default     = "d035acfd-dda4-4c76-b8f6-b8bdd810e428"
 }
 
 variable "instance_image" {
   description = "OS image  UUID (Ubuntu recommended for Docker Compose)"
   type        = string
-  default     = "e65d6156-49cc-40ad-939d-0f7e0fa3e77f"
+  default     = "d8ed87d0-1944-4f20-9108-cf21028ab9ba"
 }
 
 variable "ssh_keypair_name" {
