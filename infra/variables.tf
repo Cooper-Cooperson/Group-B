@@ -126,9 +126,9 @@ variable "instance_flavor" {
 }
 
 variable "instance_image" {
-  description = "OS image name or ID (Ubuntu recommended for Docker Compose)"
+  description = "OS image  UUID (Ubuntu recommended for Docker Compose)"
   type        = string
-  default     = "Ubuntu 24.04"
+  default     = "e65d6156-49cc-40ad-939d-0f7e0fa3e77f"
 }
 
 variable "ssh_keypair_name" {

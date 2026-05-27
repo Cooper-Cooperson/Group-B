@@ -46,6 +46,15 @@ jobs:
           domain = "${{ secrets.DOMAIN }}"
           ssh_keypair_name = "${{ secrets.SSH_KEYPAIR_NAME }}"
           EOF
+          
+      - name: Export OpenStack credentials
+        run: |
+          echo "OS_AUTH_URL=${{ secrets.OS_AUTH_URL }}" >> $GITHUB_ENV
+          echo "OS_TENANT_ID=${{ secrets.OVH_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "OS_TENANT_NAME=${{ secrets.OVH_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "OS_USERNAME=${{ secrets.APPLICATION_KEY }}" >> $GITHUB_ENV
+          echo "OS_PASSWORD=${{ secrets.APPLICATION_SECRET }}" >> $GITHUB_ENV
+          echo "OS_REGION_NAME=${{ secrets.BUCKET_REGION }}" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
