@@ -359,7 +359,7 @@ resource "ovh_cloud_project_network_private" "mks_net" {
   service_name = var.ovh_project_id
   name         = "mks-private-network"
   vlan_id      = 0
-  region       = var.region 
+  regions       = var.region 
 }
 
 resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {
