@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket         = "terraform-state-group-b"
-    region         = "de1" 
+    region         = "de" 
     key            = "infra/terraform.tfstate"
     endpoints = {s3 = "https://s3.de.io.cloud.ovh.net/"}
     skip_region_validation      = true
