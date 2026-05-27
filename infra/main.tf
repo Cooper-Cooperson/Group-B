@@ -384,6 +384,7 @@ resource "ovh_cloud_project_kube" "cluster" {
   nodes_subnet_id    = ovh_cloud_project_network_private_subnet.mks_subnet.id
 }
 
+
 resource "ovh_cloud_project_kube_nodepool" "pool" {
   service_name  = ovh_cloud_project_kube.cluster.service_name
   kube_id       = ovh_cloud_project_kube.cluster.id

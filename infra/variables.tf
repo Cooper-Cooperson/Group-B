@@ -2,16 +2,26 @@
 =============================================================================
 Escaping Microsoft — Input Variables
 =============================================================================
-These variables are injected by GitHub Actions via TF_VAR_<name> environment
-variables, sourced from repository secrets in Cooper-Cooperson/Group-B.
+These variables are injected by GitHub Actions via terraform.tfvars,
+generated from repository secrets in Cooper-Cooperson/Group-B.
 CI/CD Mapping:
-GitHub Secret          → TF_VAR_                → Terraform Variable
-APPLICATION_KEY        → TF_VAR_application_key        → var.application_key
-APPLICATION_SECRET     → TF_VAR_application_secret     → var.application_secret
-CONSUMER_KEY           → TF_VAR_consumer_key           → var.consumer_key
-ENDPOINT               → TF_VAR_endpoint               → var.endpoint
-OVH_PROJECT_ID         → TF_VAR_ovh_project_id         → var.ovh_project_id
-REGION                 → TF_VAR_region                  → var.region
+GitHub Secret            → tfvars key                    → Terraform Variable
+APPLICATION_KEY          → application_key                → var.application_key
+APPLICATION_SECRET       → application_secret             → var.application_secret
+CONSUMER_KEY             → consumer_key                   → var.consumer_key
+ENDPOINT                 → endpoint                       → var.endpoint
+OVH_PROJECT_ID           → ovh_project_id                 → var.ovh_project_id
+REGION                   → region                         → var.region
+OS_USERNAME              → os_username                    → var.os_username
+OS_PASSWORD              → os_password                    → var.os_password
+OS_PROJECT_NAME          → os_project_name                → var.os_project_name
+OS_PROJECT_ID            → os_project_id                  → var.os_project_id
+KEYCLOAK_ADMIN_USER      → keycloak_admin_user            → var.keycloak_admin_user
+KEYCLOAK_ADMIN_PASSWORD  → keycloak_admin_password        → var.keycloak_admin_password
+KEYCLOAK_HOSTNAME        → keycloak_hostname              → var.keycloak_hostname
+DOMAIN                   → domain                         → var.domain
+SSH_KEYPAIR_NAME         → ssh_keypair_name               → var.ssh_keypair_name
+ADMIN_IP_WHITELIST       → admin_ip_whitelist             → var.admin_ip_whitelist
 =============================================================================
 */
 
@@ -60,6 +70,38 @@ variable "region" {
   description = "OVHcloud datacenter region, e.g. GRA11, SBG5, DE1 (GitHub secret: REGION)"
   type        = string
   default     = "GRA11"
+}
+
+/*
+-----------------------------------------------------------------------------
+OpenStack Credentials (injected by GitHub Actions)
+Used by OVH provider when provisioning cloud resources (instances, networks,
+Kubernetes clusters). Generated from OVH Public Cloud → Users & Roles.
+⚠ NEVER hardcode the password — store it as a GitHub Actions secret.
+-----------------------------------------------------------------------------
+*/
+variable "os_username" {
+  description = "OpenStack username (GitHub secret: OS_USERNAME)"
+  type        = string
+  default     = "user-632VJcwex6A8"
+}
+
+variable "os_password" {
+  description = "OpenStack password (GitHub secret: OS_PASSWORD) — NEVER hardcode!"
+  type        = string
+  sensitive   = true
+}
+
+variable "os_project_name" {
+  description = "OpenStack project name (GitHub secret: OS_PROJECT_NAME)"
+  type        = string
+  default     = "Project Group B SuitIT"
+}
+
+variable "os_project_id" {
+  description = "OpenStack project ID (GitHub secret: OS_PROJECT_ID)"
+  type        = string
+  default     = "3696d7540bf640e8aaa3a4bed6946ec7"
 }
 
 /*
@@ -139,6 +181,7 @@ Set as TF_VAR_admin_ip_whitelist='["x.x.x.x/32"]' in your GitHub workflow.
 variable "admin_ip_whitelist" {
   description = "List of CIDR blocks allowed SSH access (port 22). Example: ['203.0.113.10/32', '198.51.100.0/24']WARNING: Never set this to ['0.0.0.0/0'] in production!"
   type        = list(string)
+  default     = ["0.0.0.0/0"]  # ⚠ TESTING ONLY — replace with real admin IPs before production!
 
   validation {
     condition     = length(var.admin_ip_whitelist) > 0
@@ -151,14 +194,31 @@ variable "admin_ip_whitelist" {
   }
 }
 
-variable keycloak_admin_user {
-  type = string
+/*
+-----------------------------------------------------------------------------
+Keycloak Configuration (injected by GitHub Actions)
+Used by the Helm chart to configure the Keycloak admin account and ingress.
+-----------------------------------------------------------------------------
+*/
+variable "keycloak_admin_user" {
+  description = "Keycloak admin username (GitHub secret: KEYCLOAK_ADMIN_USER)"
+  type        = string
+  default     = "admin"
 }
 
-variable keycloak_admin_password {
-  type = string
+variable "keycloak_admin_password" {
+  description = "Keycloak admin password (GitHub secret: KEYCLOAK_ADMIN_PASSWORD) — NEVER hardcode!"
+  type        = string
+  sensitive   = true
 }
 
-variable keycloak_hostname {
-  type = string
+variable "keycloak_hostname" {
+  description = "FQDN for the Keycloak ingress (e.g., auth.suitit.nl)"
+  type        = string
+}
+
+variable "keycloak_url" {
+  description = "Full Keycloak URL (written by workflow, unused by infra stack)"
+  type        = string
+  default     = ""
 }

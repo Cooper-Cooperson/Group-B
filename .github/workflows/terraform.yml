@@ -26,6 +26,42 @@ jobs:
       - name: Select stack
         run: echo "STACK=${{ github.event.inputs.stack }}" >> $GITHUB_ENV
 
+      # ---------------------------------------------------------------
+      # Verify that all required secrets are configured.
+      # This catches missing secrets BEFORE Terraform runs, without
+      # printing the actual values (only checks string length > 0).
+      # ---------------------------------------------------------------
+      - name: Verify secrets are set
+        run: |
+          MISSING=()
+          [ -z "${{ secrets.ENDPOINT }}" ]               && MISSING+=("ENDPOINT")
+          [ -z "${{ secrets.APPLICATION_KEY }}" ]         && MISSING+=("APPLICATION_KEY")
+          [ -z "${{ secrets.APPLICATION_SECRET }}" ]      && MISSING+=("APPLICATION_SECRET")
+          [ -z "${{ secrets.CONSUMER_KEY }}" ]            && MISSING+=("CONSUMER_KEY")
+          [ -z "${{ secrets.OVH_PROJECT_ID }}" ]          && MISSING+=("OVH_PROJECT_ID")
+          [ -z "${{ secrets.REGION }}" ]                  && MISSING+=("REGION")
+          [ -z "${{ secrets.OS_USERNAME }}" ]             && MISSING+=("OS_USERNAME")
+          [ -z "${{ secrets.OS_PASSWORD }}" ]             && MISSING+=("OS_PASSWORD")
+          [ -z "${{ secrets.OS_PROJECT_NAME }}" ]         && MISSING+=("OS_PROJECT_NAME")
+          [ -z "${{ secrets.OS_PROJECT_ID }}" ]           && MISSING+=("OS_PROJECT_ID")
+          [ -z "${{ secrets.KEYCLOAK_ADMIN_USER }}" ]     && MISSING+=("KEYCLOAK_ADMIN_USER")
+          [ -z "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" ] && MISSING+=("KEYCLOAK_ADMIN_PASSWORD")
+          [ -z "${{ secrets.KEYCLOAK_HOSTNAME }}" ]       && MISSING+=("KEYCLOAK_HOSTNAME")
+          [ -z "${{ secrets.ADMIN_IP_WHITELIST }}" ]      && MISSING+=("ADMIN_IP_WHITELIST")
+          [ -z "${{ secrets.DOMAIN }}" ]                  && MISSING+=("DOMAIN")
+          [ -z "${{ secrets.SSH_KEYPAIR_NAME }}" ]        && MISSING+=("SSH_KEYPAIR_NAME")
+
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "::error::Missing required secrets: ${MISSING[*]}"
+            echo "Go to: Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured."
+
+      # ---------------------------------------------------------------
+      # Generate terraform.tfvars from GitHub secrets.
+      # This file is git-ignored and only exists in the runner.
+      # ---------------------------------------------------------------
       - name: Create tfvars file
         run: |
           cat <<EOF > $STACK/terraform.tfvars
@@ -35,6 +71,10 @@ jobs:
           consumer_key = "${{ secrets.CONSUMER_KEY }}"
           ovh_project_id = "${{ secrets.OVH_PROJECT_ID }}"
           region = "${{ secrets.REGION }}"
+          os_username = "${{ secrets.OS_USERNAME }}"
+          os_password = "${{ secrets.OS_PASSWORD }}"
+          os_project_name = "${{ secrets.OS_PROJECT_NAME }}"
+          os_project_id = "${{ secrets.OS_PROJECT_ID }}"
           keycloak_admin_user = "${{ secrets.KEYCLOAK_ADMIN_USER }}"
           keycloak_admin_password = "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
           keycloak_hostname = "${{ secrets.KEYCLOAK_HOSTNAME }}"
@@ -44,7 +84,7 @@ jobs:
           EOF
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
