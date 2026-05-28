@@ -359,30 +359,32 @@ data "ovh_domain_zone" "main" {
 temporary private network
 */
 
-resource "ovh_vrack" "vrack" {
-  name = "kubernetes-vrack"
+resource "ovh_cloud_project_network_private" "network" {
+  service_name = var.ovh_project_id 
+  vlan_id     = 42
+  name       = "terraform_testacc_private_net"
+  regions    = [var.kubernetes_region]
 }
 
-resource "ovh_vrack_cloudproject" "attach" {
-  service_name = ovh_vrack.vrack.id     # vRack ID
-  project_id   = var.ovh_project_id   
+resource "ovh_cloud_project_network_private_subnet" "subnet" {
+  service_name = var.ovh_project_id 
+  network_id   = ovh_cloud_project_network_private.network.id
+
+  region     = var.kubernetes_region
+  start      = "192.168.168.100"
+  end        = "192.168.168.200"
+  network    = "192.168.168.0/24"
+  dhcp       = true
+  no_gateway = false
 }
 
-resource "ovh_cloud_project_network_private" "mks_net" {
-  service_name = var.ovh_project_id
-  name         = "mks-private-network"
-  vlan_id      = 20
-}
-
-resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {
-  service_name = var.ovh_project_id
-  network_id   = ovh_cloud_project_network_private.mks_net.id
-
-  region  = var.kubernetes_region
-  start   = "192.168.10.10"
-  end     = "192.168.10.250"
-  network = "192.168.10.0/24"
-  dhcp    = true
+resource "ovh_cloud_project_gateway" "gateway" {
+  service_name = var.ovh_project_id 
+  name       = "gateway"
+  model      = "s"
+  region     = var.kubernetes_region
+  network_id = tolist(ovh_cloud_project_network_private.network.regions_attributes[*].openstackid)[0]
+  subnet_id  = ovh_cloud_project_network_private_subnet.subnet.id
 }
 
 /*
@@ -393,8 +395,12 @@ resource "ovh_cloud_project_kube" "cluster" {
   name         = "mks-keycloak"
   region       = var.kubernetes_region
 
-  private_network_id = ovh_cloud_project_network_private.mks_net.id
-  nodes_subnet_id    = ovh_cloud_project_network_private_subnet.mks_subnet.id
+  private_network_id =tolist(ovh_cloud_project_network_private.network.regions_attributes[*].openstackid)[0]
+  nodes_subnet_id    = ovh_cloud_project_network_private_subnet.subnet.id
+  private_network_configuration {
+      default_vrack_gateway              = ""
+      private_network_routing_as_default = false
+  }
 }
 
 
