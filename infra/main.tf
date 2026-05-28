@@ -67,7 +67,7 @@ resource "ovh_cloud_project_instance" "server" {
   service_name   = var.ovh_project_id
   name           = var.instance_name
   region         = var.region
-  billing_period = "monthly"
+  billing_period = "hourly"
 
   flavor {
     flavor_id = var.instance_flavor
