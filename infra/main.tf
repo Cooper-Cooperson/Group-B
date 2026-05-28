@@ -465,7 +465,7 @@ resource "helm_release" "keycloak" {
   namespace        = "keycloak"
   create_namespace = true
 
-  repository = "oci://registry-1.docker.io/bitnamicharts" #else https://charts.bitnami.com/bitnami
+  repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "keycloak" 
   #version    = "25.2.0"
 
