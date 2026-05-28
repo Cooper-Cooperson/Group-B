@@ -123,12 +123,13 @@ all work without additional configuration).
 =============================================================================
 Enable the IP Firewall on the server's public IP
 */
+/*
 resource "ovh_ip_firewall" "server" {
   ip             = local.public_ipv4
   ip_on_firewall = local.public_ipv4
   enabled        = true
 }
-
+*/
 /*
 -----------------------------------------------------------------------------
 Seq 0–4: SSH (Port 22/TCP) — Admin IP Whitelist Only
@@ -362,14 +363,14 @@ resource "ovh_vrack" "vrack" {
 }
 
 resource "ovh_vrack_cloudproject" "attach" {
-  vrack_id     = ovh_vrack.vrack.id
-  project_id   = var.ovh_project_id
+  service_name = ovh_vrack.vrack.id     # vRack ID
+  project_id   = var.ovh_project_id   
 }
 
 resource "ovh_cloud_project_network_private" "mks_net" {
   service_name = var.ovh_project_id
   name         = "mks-private-network"
-  vlan_id      = 0
+  vlan_id      = 20
 }
 
 resource "ovh_cloud_project_network_private_subnet" "mks_subnet" {

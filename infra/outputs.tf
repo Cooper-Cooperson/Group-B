@@ -17,11 +17,12 @@ Server Public IP — The single most important output
 Used by DNS records, SSH access, and Docker Compose configuration.
 -----------------------------------------------------------------------------
 */
+/*
 output "server_public_ipv4" {
   description = "Public IPv4 address of the workplace server"
   value       = local.public_ipv4
 }
-
+*/
 /*
 -----------------------------------------------------------------------------
 DNS Nameservers — Point your domain registrar to these
@@ -76,16 +77,18 @@ output "firewall_enabled" {
 SSH Connection — Copy-paste ready command for admin access
 -----------------------------------------------------------------------------
 */
+/*
 output "ssh_command" {
   description = "SSH connection command (assumes Ubuntu default user)"
   value       = "ssh ubuntu@${local.public_ipv4}"
 }
-
+*/
 /*
 -----------------------------------------------------------------------------
 Instance Metadata
 -----------------------------------------------------------------------------
 */
+/*
 output "instance_id" {
   description = "OVH Cloud instance ID"
   value       = ovh_cloud_project_instance.server.id
@@ -95,3 +98,4 @@ output "instance_region" {
   description = "Datacenter region where the instance is deployed"
   value       = var.region
 }
+*/
