@@ -124,13 +124,13 @@ all work without additional configuration).
 =============================================================================
 Enable the IP Firewall on the server's public IP
 */
-/*
+
 resource "ovh_ip_firewall" "server" {
   ip             = local.public_ipv4
   ip_on_firewall = local.public_ipv4
   enabled        = true
 }
-*/
+
 /*
 -----------------------------------------------------------------------------
 Seq 0–4: SSH (Port 22/TCP) — Admin IP Whitelist Only
