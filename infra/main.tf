@@ -467,7 +467,7 @@ resource "helm_release" "keycloak" {
 
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "keycloak"
-  version    = "26.6.0"
+  version    = "26.5.2"
 
   depends_on = [
     helm_release.ingress_nginx,
@@ -488,7 +488,7 @@ resource "helm_release" "keycloak" {
     name  = "ingress.enabled"
     value = "true"
   }
-  
+
    set {
     name  = "ingress.ingressClassName"
     value = "nginx"
