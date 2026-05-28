@@ -80,6 +80,7 @@ resource "ovh_cloud_project_instance" "server" {
   network {
     public = true
   }
+}
 /*
   ssh_key {
     name = var.ssh_keypair_name
@@ -97,7 +98,7 @@ locals {
     addr.ip if addr.version == 4
   ][0]
 }
-
+}
 /*
 =============================================================================
 SECTION 2: IP FIREWALL (Ingress Rules)
