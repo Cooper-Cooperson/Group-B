@@ -120,7 +120,7 @@ variable "instance_name" {
 variable "instance_flavor" {
   description = "OVHcloud instance flavor ID (e.g., b2-15, b2-30, b2-60)"
   type        = string
-  default     = "d035acfd-dda4-4c76-b8f6-b8bdd810e428"
+  default     = "45ca263c-0373-4902-ab39-e5f0fc118190"
 }
 
 variable "instance_image" {
@@ -208,5 +208,9 @@ variable keycloak_admin_password {
 }
 
 variable keycloak_hostname {
+  type = string
+}
+
+variable kubernetes_region {
   type = string
 }
