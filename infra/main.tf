@@ -434,7 +434,7 @@ resource "helm_release" "ingress_nginx" {
   name             = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-
+  timeout = 600 
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   version    = "4.11.0"
@@ -453,7 +453,7 @@ resource "helm_release" "cert_manager" {
   name             = "ovh-cert-lab"
   namespace        = "cert-manager"
   create_namespace = true
-
+  timeout = 600 
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
   version    = "1.6.1"
@@ -468,7 +468,7 @@ resource "helm_release" "keycloak" {
   name             = "keycloak"
   namespace        = "keycloak"
   create_namespace = true
-
+  timeout = 600 
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "keycloak" 
   #version    = "25.2.0"
