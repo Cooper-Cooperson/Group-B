@@ -465,7 +465,7 @@ resource "helm_release" "keycloak" {
   namespace        = "keycloak"
   create_namespace = true
 
-  repository = "https://charts.bitnami.com/bitnami"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "keycloak"
   version    = "26.6.0"
 
@@ -487,6 +487,11 @@ resource "helm_release" "keycloak" {
   set {
     name  = "ingress.enabled"
     value = "true"
+  }
+  
+   set {
+    name  = "ingress.ingressClassName"
+    value = "nginx"
   }
 
   set {
