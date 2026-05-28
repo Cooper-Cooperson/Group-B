@@ -62,7 +62,7 @@ Single-node server running the entire stack via Docker Compose:
 • Traefik/Nginx                  — Reverse proxy + TLS termination
 =============================================================================
 */
-/*
+
 resource "ovh_cloud_project_instance" "server" {
   service_name   = var.ovh_project_id
   name           = var.instance_name
@@ -80,23 +80,24 @@ resource "ovh_cloud_project_instance" "server" {
   network {
     public = true
   }
-
+/*
   ssh_key {
     name = var.ssh_keypair_name
   }
 }
 */
+
 /*
 Extract the public IPv4 address from the instance's address list
 */
-/*
+
 locals {
   public_ipv4 = [
     for addr in ovh_cloud_project_instance.server.addresses :
     addr.ip if addr.version == 4
   ][0]
 }
-*/
+
 /*
 =============================================================================
 SECTION 2: IP FIREWALL (Ingress Rules)
