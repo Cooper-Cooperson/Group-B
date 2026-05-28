@@ -80,13 +80,12 @@ resource "ovh_cloud_project_instance" "server" {
   network {
     public = true
   }
-}
-/*
+
   ssh_key {
     name = var.ssh_keypair_name
   }
 }
-*/
+
 
 /*
 Extract the public IPv4 address from the instance's address list
