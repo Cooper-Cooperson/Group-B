@@ -443,6 +443,10 @@ resource "helm_release" "ingress_nginx" {
     name  = "controller.service.type"
     value = "LoadBalancer"
   }
+  
+  depends_on = [
+    ovh_cloud_project_kube_nodepool.pool
+  ]
 }
 
 resource "helm_release" "cert_manager" {
@@ -452,7 +456,7 @@ resource "helm_release" "cert_manager" {
 
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.6.1"
+  version    = "1.6.1"
 
   set {
     name  = "installCRDs"
