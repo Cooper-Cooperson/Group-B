@@ -93,4 +93,8 @@ variable "ssh_keypair_name" {
 variable "admin_ip_whitelist" {
   type    = list(string)
   default = ["0.0.0.0/0"]
-}
+}
+
+variable kubernetes_region {
+  type = string
+}

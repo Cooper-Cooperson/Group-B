@@ -49,6 +49,7 @@ jobs:
           keycloak_url = "https://${{ secrets.KEYCLOAK_HOSTNAME }}/"
           domain = "${{ secrets.DOMAIN }}"
           ssh_keypair_name = "${{ secrets.SSH_KEYPAIR_NAME }}"
+          kubernetes_region = "${{ secrets.KUBERNETES_REGION }}"
           EOF
 
       - name: Export OpenStack credentials
