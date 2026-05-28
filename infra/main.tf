@@ -467,7 +467,7 @@ resource "helm_release" "keycloak" {
 
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "keycloak"
-  version    = "22.3.0"
+  version    = "26.6.0"
 
   depends_on = [
     helm_release.ingress_nginx,
