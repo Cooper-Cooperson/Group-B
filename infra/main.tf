@@ -465,9 +465,9 @@ resource "helm_release" "keycloak" {
   namespace        = "keycloak"
   create_namespace = true
 
-  repository = "oci://registry-1.docker.io/bitnamicharts"
+  repository = "oci://registry-1.docker.io/bitnamicharts/keycloak"
   chart      = "keycloak"
-  version    = "26.5.2"
+  version    = "25.2.0"
 
   depends_on = [
     helm_release.ingress_nginx,
