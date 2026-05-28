@@ -98,7 +98,7 @@ locals {
     addr.ip if addr.version == 4
   ][0]
 }
-}
+
 /*
 =============================================================================
 SECTION 2: IP FIREWALL (Ingress Rules)
