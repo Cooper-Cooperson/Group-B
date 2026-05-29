@@ -388,7 +388,7 @@ resource "ovh_cloud_project_gateway" "gateway" {
   subnet_id  = ovh_cloud_project_network_private_subnet.subnet.id
 }
 
-data "template_file" " cloud_init" {
+data "template_file" "cloud_init" {
   template = file("${path.module}/cloud-init-keycloak-caddy.yaml.tpl")
 
   vars = {
