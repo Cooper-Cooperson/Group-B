@@ -98,14 +98,14 @@ output "instance_region" {
 }
 
 
-output "keycloak_public_url" {
-  value = "https://${var.keycloak_hostname}"
-}
-
 output "keycloak_vm_ip" {
-  value = ovh_cloud_project_instance.keycloak_vm.ip_address
+  value = openstack_compute_instance_v2.keycloak_vm.access_ip_v4
 }
 
-output "loadbalancer_ip" {
-  value = ovh_cloud_project_loadbalancer.lb.ip_address
+output "loadbalancer_vip" {
+  value = openstack_lb_loadbalancer_v2.lb.vip_address
+}
+
+output "keycloak_url" {
+  value = "https://${var.keycloak_hostname}"
 }

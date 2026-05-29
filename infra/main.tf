@@ -399,68 +399,90 @@ data "template_file" "cloud_init" {
   }
 }
 
+data "template_file" "cloud_init" {
+  template = file("${path.module}/cloud-init-keycloak-caddy.yaml.tpl")
+
+  vars = {
+    KEYCLOAK_VERSION   = var.keycloak_version
+    KEYCLOAK_ADMIN     = var.keycloak_admin_user
+    KEYCLOAK_PASSWORD  = var.keycloak_admin_password
+    KEYCLOAK_HOSTNAME  = var.keycloak_hostname
+    LETSENCRYPT_EMAIL  = "admin@${replace(var.keycloak_hostname, "/^[^.]+\\./", "")}"
+  }
+}
+
 resource "ovh_cloud_project_instance" "keycloak_vm" {
   service_name = var.ovh_project_id
   region       = var.region
   name         = "keycloak-vm"
-  flavor_id    = var.instance_flavor
-  image_id     = var.instance_image
-  ssh_key_id   = var.ssh_key_name_keycloack
 
+  flavor {
+    flavor_id = var.instance_flavor
+  }
+
+  boot_from {
+    image_id = var.instance_image
+  }
+
+  key_pair = var.ssh_key_name_keycloack
   billing_period = "hourly"
   user_data       = data.template_file.cloud_init.rendered
 
   network {
-  uuid = ovh_cloud_project_network_private.network.id
-  ip   = "192.168.168.101"
-}
-}
-
-resource "ovh_cloud_project_loadbalancer" "lb" {
-  service_name = var.ovh_project_id
-  region       = var.region
-  name         = "keycloak-lb"
-}
-
-# Backend pool (farm) pointing to the keycloack VM on port 8080
-resource "ovh_cloud_project_loadbalancer_farm" "keycloak_farm" {
-  service_name   = var.ovh_project_id
-  region         = var.region
-  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
-
-  name     = "keycloak-farm"
-  protocol = "tcp"
-  port     = 8080
-}
-
-resource "ovh_cloud_project_loadbalancer_farm_server" "keycloak_server" {
-  service_name   = var.ovh_project_id
-  region         = var.region
-  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
-  farm_id        = ovh_cloud_project_loadbalancer_farm.keycloak_farm.id
-
-  address = ovh_cloud_project_instance.keycloak_vm.ip_address
-  port    = 8080
-}
-
-#  HTTPS frontend with Let's Encrypt
-resource "ovh_cloud_project_loadbalancer_frontend" "https_frontend" {
-  service_name   = var.ovh_project_id
-  region         = var.region
-  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
-
-  name     = "keycloak-https"
-  protocol = "https"
-  port     = 443
-
-/*
-  lets_encrypt {
-    enabled  = true
-    hostname = var.keycloak_hostname
-    email    = "admin@${replace(var.keycloak_hostname, "/^[^.]+\\./", "")}"
+    name = ovh_cloud_project_network_private.network.name
+    fixed_ip_v4 = "192.168.168.101"
   }
-*/
-  default_farm_id = ovh_cloud_project_loadbalancer_farm.keycloak_farm.id
 }
 
+data "openstack_networking_network_v2" "public" {
+  name = "Ext-Net"
+}
 
+resource "openstack_lb_loadbalancer_v2" "lb" {
+  name          = "keycloak-lb"
+  vip_network_id = data.openstack_networking_network_v2.public.id
+}
+
+# HTTP (80) passthrough to Caddy
+resource "openstack_lb_listener_v2" "http" {
+  name            = "keycloak-http"
+  protocol        = "TCP"
+  protocol_port   = 80
+  loadbalancer_id = openstack_lb_loadbalancer_v2.lb.id
+}
+
+resource "openstack_lb_pool_v2" "http_pool" {
+  name         = "keycloak-http-pool"
+  protocol     = "TCP"
+  lb_algorithm = "ROUND_ROBIN"
+  listener_id  = openstack_lb_listener_v2.http.id
+}
+
+resource "openstack_lb_member_v2" "http_member" {
+  pool_id       = openstack_lb_pool_v2.http_pool.id
+  address       = "192.168.168.101"
+  protocol_port = 80
+  subnet_id     = ovh_cloud_project_network_private_subnet.subnet.id
+}
+
+# HTTPS (443) passthrough to Caddy
+resource "openstack_lb_listener_v2" "https" {
+  name            = "keycloak-https"
+  protocol        = "TCP"
+  protocol_port   = 443
+  loadbalancer_id = openstack_lb_loadbalancer_v2.lb.id
+}
+
+resource "openstack_lb_pool_v2" "https_pool" {
+  name         = "keycloak-https-pool"
+  protocol     = "TCP"
+  lb_algorithm = "ROUND_ROBIN"
+  listener_id  = openstack_lb_listener_v2.https.id
+}
+
+resource "openstack_lb_member_v2" "https_member" {
+  pool_id       = openstack_lb_pool_v2.https_pool.id
+  address       = "192.168.168.101"
+  protocol_port = 443
+  subnet_id     = ovh_cloud_project_network_private_subnet.subnet.id
+}
