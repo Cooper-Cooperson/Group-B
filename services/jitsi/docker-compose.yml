@@ -1,0 +1,67 @@
+services:
+  jitsi-web:
+    image: jitsi/web:latest
+    restart: unless-stopped
+    environment:
+      - PUBLIC_URL=https://meet.suitit.nl
+      - XMPP_SERVER=prosody
+      - XMPP_BOSH_URL_BASE=http://prosody:5280
+      - JICOFO_AUTH_USER=focus
+      - TZ=Europe/Amsterdam
+    volumes:
+      - jitsi_web_config:/config
+    networks:
+      - proxy-net
+      - jitsi-net
+
+  prosody:
+    image: jitsi/prosody:latest
+    restart: unless-stopped
+    environment:
+      - XMPP_DOMAIN=meet.suitit.nl
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD}
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD}
+      - TZ=Europe/Amsterdam
+    volumes:
+      - prosody_config:/config
+    networks:
+      - jitsi-net
+
+  jicofo:
+    image: jitsi/jicofo:latest
+    restart: unless-stopped
+    environment:
+      - XMPP_SERVER=prosody
+      - XMPP_DOMAIN=meet.suitit.nl
+      - JICOFO_AUTH_USER=focus
+      - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD}
+      - TZ=Europe/Amsterdam
+    networks:
+      - jitsi-net
+
+  jvb:
+    image: jitsi/jvb:latest
+    restart: unless-stopped
+    ports:
+      - "10000:10000/udp"
+    environment:
+      - XMPP_SERVER=prosody
+      - XMPP_DOMAIN=meet.suitit.nl
+      - JVB_AUTH_USER=jvb
+      - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD}
+      - DOCKER_HOST_ADDRESS=${DOCKER_HOST_ADDRESS}
+      - TZ=Europe/Amsterdam
+    networks:
+      - jitsi-net
+
+volumes:
+  jitsi_web_config:
+  prosody_config:
+
+networks:
+  proxy-net:
+    external: true
+  jitsi-net:
+    driver: bridge
