@@ -96,3 +96,16 @@ output "instance_region" {
   description = "Datacenter region where the instance is deployed"
   value       = var.region
 }
+
+
+output "keycloak_public_url" {
+  value = "https://${var.keycloak_hostname}"
+}
+
+output "keycloak_vm_ip" {
+  value = ovh_cloud_project_instance.keycloak_vm.ip_address
+}
+
+output "loadbalancer_ip" {
+  value = ovh_cloud_project_loadbalancer.lb.ip_address
+}

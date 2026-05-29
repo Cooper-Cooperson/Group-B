@@ -28,9 +28,9 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.29"
     }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.13"
+    template = {
+      source  = "hashicorp/template"
+      version = ">= 2.2.0"
     }
   }
 }
@@ -355,22 +355,23 @@ data "ovh_domain_zone" "main" {
   name = var.domain
 }
 */
+
 /*
-temporary private network
+Private network
 */
 
 resource "ovh_cloud_project_network_private" "network" {
   service_name = var.ovh_project_id 
   vlan_id     = 42
   name       = "terraform_testacc_private_net"
-  regions    = [var.kubernetes_region]
+  regions    = [var.region]
 }
 
 resource "ovh_cloud_project_network_private_subnet" "subnet" {
   service_name = var.ovh_project_id 
   network_id   = ovh_cloud_project_network_private.network.id
 
-  region     = var.kubernetes_region
+  region     = var.region
   start      = "192.168.168.100"
   end        = "192.168.168.200"
   network    = "192.168.168.0/24"
@@ -382,139 +383,84 @@ resource "ovh_cloud_project_gateway" "gateway" {
   service_name = var.ovh_project_id 
   name       = "gateway"
   model      = "s"
-  region     = var.kubernetes_region
+  region     = var.region
   network_id = tolist(ovh_cloud_project_network_private.network.regions_attributes[*].openstackid)[0]
   subnet_id  = ovh_cloud_project_network_private_subnet.subnet.id
 }
 
-/*
-Kubernetes for Keycloak
-*/
-resource "ovh_cloud_project_kube" "cluster" {
+#keycloak template
+data "template_file" "cloud_init" {
+  template = file("${path.module}/cloud-init-keycloak.yaml.tpl")
+
+  vars = {
+    KEYCLOAK_VERSION  = var.keycloak_version
+    KEYCLOAK_ADMIN    = var.keycloak_admin_user
+    KEYCLOAK_PASSWORD = var.keycloak_admin_password
+  }
+}
+
+resource "ovh_cloud_project_instance" "keycloak_vm" {
   service_name = var.ovh_project_id
-  name         = "mks-keycloak"
-  region       = var.kubernetes_region
+  region       = var.region
+  name         = "keycloak-vm"
+  flavor_id    = var.instance_flavor
+  image_id     = var.instance_image
+  ssh_key_id   = var.ssh_key_name_keycloack
 
-  private_network_id =tolist(ovh_cloud_project_network_private.network.regions_attributes[*].openstackid)[0]
-  nodes_subnet_id    = ovh_cloud_project_network_private_subnet.subnet.id
-  private_network_configuration {
-      default_vrack_gateway              = ""
-      private_network_routing_as_default = false
+  billing_period = "hourly"
+  user_data       = data.template_file.cloud_init.rendered
+
+  network {
+  uuid = ovh_cloud_project_network_private.network.id
+  ip   = "192.168.168.101"
+}
+}
+
+resource "ovh_cloud_project_loadbalancer" "lb" {
+  service_name = var.ovh_project_id
+  region       = var.region
+  name         = "keycloak-lb"
+}
+
+# Backend pool (farm) pointing to the keycloack VM on port 8080
+resource "ovh_cloud_project_loadbalancer_farm" "keycloak_farm" {
+  service_name   = var.ovh_project_id
+  region         = var.region
+  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
+
+  name     = "keycloak-farm"
+  protocol = "tcp"
+  port     = 8080
+}
+
+resource "ovh_cloud_project_loadbalancer_farm_server" "keycloak_server" {
+  service_name   = var.ovh_project_id
+  region         = var.region
+  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
+  farm_id        = ovh_cloud_project_loadbalancer_farm.keycloak_farm.id
+
+  address = ovh_cloud_project_instance.keycloak_vm.ip_address
+  port    = 8080
+}
+
+#  HTTPS frontend with Let's Encrypt
+resource "ovh_cloud_project_loadbalancer_frontend" "https_frontend" {
+  service_name   = var.ovh_project_id
+  region         = var.region
+  loadbalancer_id = ovh_cloud_project_loadbalancer.lb.id
+
+  name     = "keycloak-https"
+  protocol = "https"
+  port     = 443
+
+/*
+  lets_encrypt {
+    enabled  = true
+    hostname = var.keycloak_hostname
+    email    = "admin@${replace(var.keycloak_hostname, "/^[^.]+\\./", "")}"
   }
+*/
+  default_farm_id = ovh_cloud_project_loadbalancer_farm.keycloak_farm.id
 }
 
 
-resource "ovh_cloud_project_kube_nodepool" "pool" {
-  service_name  = ovh_cloud_project_kube.cluster.service_name
-  kube_id       = ovh_cloud_project_kube.cluster.id
-  name          = "pool1"
-  flavor_name   = "b3-8"
-  desired_nodes = 3
-}
-
-provider "kubernetes" {
-  host = ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].host
-
-  client_certificate     = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].client_certificate)
-  client_key             = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].client_key)
-  cluster_ca_certificate = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].cluster_ca_certificate)
-}
-
-provider "helm" {
-  kubernetes {
-    host = ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].host
-
-    client_certificate     = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].client_certificate)
-    client_key             = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].client_key)
-    cluster_ca_certificate = base64decode(ovh_cloud_project_kube.cluster.kubeconfig_attributes[0].cluster_ca_certificate)
-  }
-}
-
-resource "helm_release" "ingress_nginx" {
-  name             = "ingress-nginx"
-  namespace        = "ingress-nginx"
-  create_namespace = true
-  timeout = 600 
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  version    = "4.11.0"
-
-  set {
-    name  = "controller.service.type"
-    value = "LoadBalancer"
-  }
-  
-  depends_on = [
-    ovh_cloud_project_kube_nodepool.pool
-  ]
-}
-
-resource "helm_release" "cert_manager" {
-  name             = "ovh-cert-lab"
-  namespace        = "cert-manager"
-  create_namespace = true
-  timeout = 600 
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "1.6.1"
-
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-}
-
-resource "helm_release" "keycloak" {
-  name             = "keycloak"
-  namespace        = "keycloak"
-  create_namespace = true
-  timeout = 600 
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "keycloak" 
-  #version    = "25.2.0"
-
-  depends_on = [
-    helm_release.ingress_nginx,
-    helm_release.cert_manager
-  ]
-
-  set {
-    name  = "auth.adminUser"
-    value = var.keycloak_admin_user
-  }
-
-  set {
-    name  = "auth.adminPassword"
-    value = var.keycloak_admin_password
-  }
-
-  set {
-    name  = "ingress.enabled"
-    value = "true"
-  }
-
-   set {
-    name  = "ingress.ingressClassName"
-    value = "nginx"
-  }
-
-  set {
-    name  = "ingress.hostname"
-    value = var.keycloak_hostname
-  }
-
-  set {
-    name  = "proxy.tls.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "proxy.tls.autoGenerated"
-    value = "false"
-  }
-
-  set {
-    name  = "proxy.tls.existingSecret"
-    value = "keycloak-tls"
-  }
-}

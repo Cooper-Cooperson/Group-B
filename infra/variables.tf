@@ -211,6 +211,11 @@ variable keycloak_hostname {
   type = string
 }
 
-variable kubernetes_region {
+variable keycloak_version {
   type = string
+}
+
+variable ssh_key_name_keycloack {
+  description = "Name of the SSH key pair already registered in the OVHcloud project"
+  type        = string
 }
