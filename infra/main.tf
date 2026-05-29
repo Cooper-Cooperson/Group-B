@@ -411,27 +411,26 @@ data "template_file" "cloud_init" {
   }
 }
 
-resource "ovh_cloud_project_instance" "keycloak_vm" {
-  service_name = var.ovh_project_id
-  region       = var.region
-  name         = "keycloak-vm"
+resource "openstack_compute_instance_v2" "keycloak_vm" {
+  name        = "keycloak-vm"
+  flavor_name = var.instance_flavor
 
-  flavor {
-    flavor_id = var.instance_flavor
-  }
-
-  boot_from {
-    image_id = var.instance_image
+  block_device {
+    uuid                  = var.instance_image
+    source_type           = "image"
+    destination_type      = "local"
+    boot_index            = 0
+    delete_on_termination = true
   }
 
   key_pair = var.ssh_key_name_keycloack
-  billing_period = "hourly"
-  user_data       = data.template_file.cloud_init.rendered
 
   network {
-    name = ovh_cloud_project_network_private.network.name
+    name        = ovh_cloud_project_network_private.network.name
     fixed_ip_v4 = "192.168.168.101"
   }
+
+  user_data = data.template_file.cloud_init.rendered
 }
 
 data "openstack_networking_network_v2" "public" {
@@ -454,7 +453,7 @@ resource "openstack_lb_listener_v2" "http" {
 resource "openstack_lb_pool_v2" "http_pool" {
   name         = "keycloak-http-pool"
   protocol     = "TCP"
-  lb_algorithm = "ROUND_ROBIN"
+  lb_method = "ROUND_ROBIN"
   listener_id  = openstack_lb_listener_v2.http.id
 }
 
@@ -476,7 +475,7 @@ resource "openstack_lb_listener_v2" "https" {
 resource "openstack_lb_pool_v2" "https_pool" {
   name         = "keycloak-https-pool"
   protocol     = "TCP"
-  lb_algorithm = "ROUND_ROBIN"
+  lb_method = "ROUND_ROBIN"
   listener_id  = openstack_lb_listener_v2.https.id
 }
 
