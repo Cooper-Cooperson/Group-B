@@ -96,3 +96,7 @@ output "instance_region" {
   description = "Datacenter region where the instance is deployed"
   value       = var.region
 }
+
+output "keycloak_url" {
+  value = "https://${var.keycloak_hostname}"
+}

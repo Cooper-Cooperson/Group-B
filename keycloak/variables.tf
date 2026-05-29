@@ -1,100 +1,65 @@
-/*
------------------------------------------------------------------------------
-Keycloak Stack — Input Variables
-Injected by GitHub Actions via terraform.tfvars
-(auto-generated from repository secrets).
-The workflow writes ALL secrets into the tfvars file, so variables
-that only the infra stack uses are silently ignored here.
------------------------------------------------------------------------------
-*/
-
-variable "endpoint" {
+variable keycloak_admin_user {
   type = string
 }
 
-variable "application_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "application_secret" {
-  type      = string
-  sensitive = true
-}
-
-variable "consumer_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "ovh_project_id" {
+variable keycloak_admin_password {
   type = string
 }
 
-variable "region" {
-  type    = string
-  default = "GRA11"
-}
-
-variable "keycloak_admin_user" {
-  type    = string
-  default = "admin"
-}
-
-variable "keycloak_admin_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "keycloak_hostname" {
+variable keycloak_hostname {
   type = string
 }
 
-variable "keycloak_url" {
-  description = "Full Keycloak URL including protocol (e.g., https://auth.suitit.nl/)"
+variable keycloak_version {
+  type = string
+}
+
+variable ssh_key_name_keycloack {
+  description = "Name of the SSH key pair already registered in the OVHcloud project"
   type        = string
 }
 
-/* ---- Variables written by the shared tfvars but unused by this stack ---- */
-/* Terraform silently ignores extra keys in .tfvars, but only if they are    */
-/* declared. We declare them here to avoid 'unsupported argument' errors.    */
-
-variable "os_username" {
-  type    = string
-  default = ""
+variable "instance_flavor" {
+  description = "OVHcloud instance flavor ID (e.g., b2-15, b2-30, b2-60)"
+  type        = string
+  default     = "45ca263c-0373-4902-ab39-e5f0fc118190"
 }
 
-variable "os_password" {
-  type      = string
-  default   = ""
-  sensitive = true
+variable "instance_image" {
+  description = "OS image  UUID (Ubuntu recommended for Docker Compose)"
+  type        = string
+  default     = "d8ed87d0-1944-4f20-9108-cf21028ab9ba"
 }
 
-variable "os_project_name" {
-  type    = string
-  default = ""
+variable "ovh_project_id" {
+  description = "OVH Public Cloud project ID (GitHub secret: OVH_PROJECT_ID)"
+  type        = string
 }
 
-variable "os_project_id" {
-  type    = string
-  default = ""
+variable "region" {
+  type        = string
 }
 
-variable "domain" {
-  type    = string
-  default = ""
+variable "application_key" {
+  description = "OVH API application key (GitHub secret: APPLICATION_KEY)"
+  type        = string
+  sensitive   = true
 }
 
-variable "ssh_keypair_name" {
-  type    = string
-  default = ""
+variable "application_secret" {
+  description = "OVH API application secret (GitHub secret: APPLICATION_SECRET)"
+  type        = string
+  sensitive   = true
 }
 
-variable "admin_ip_whitelist" {
-  type    = list(string)
-  default = ["0.0.0.0/0"]
+variable "consumer_key" {
+  description = "OVH API consumer key (GitHub secret: CONSUMER_KEY)"
+  type        = string
+  sensitive   = true
 }
 
-variable kubernetes_region {
-  type = string
+variable "endpoint" {
+  description = "OVH API endpoint — ovh-eu, ovh-us, or ovh-ca (GitHub secret: ENDPOINT)"
+  type        = string
+  default     = "ovh-eu"
 }
