@@ -53,9 +53,8 @@ provider "ovh" {
   consumer_key       = var.consumer_key
 }
 provider "openstack" {
-  auth_url    = "https://auth.cloud.ovh.net/"
+  auth_url    = "https://auth.cloud.ovh.net/v3"
   region      = "UK1"
-  auth_type = "v3applicationcredential"
   application_credential_id     = var.application_credential_id
   application_credential_secret = var.application_credential_secret
 }
