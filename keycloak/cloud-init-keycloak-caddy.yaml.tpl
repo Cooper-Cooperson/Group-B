@@ -15,7 +15,7 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: start --hostname ${KEYCLOAK_HOSTNAME} --http-port=8080
+          ccommand: start-dev --http-port=8080 --hostname=${KEYCLOAK_HOSTNAME}
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
