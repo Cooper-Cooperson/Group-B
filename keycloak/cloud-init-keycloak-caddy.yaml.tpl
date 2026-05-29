@@ -15,30 +15,13 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: start-dev --http-port=8080 --hostname=${KEYCLOAK_HOSTNAME}
+          command: start-dev --http-port=8080 --hostname-strict=false --hostname-strict-https=false
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
             - "8080:8080"
           restart: always
-
-        caddy:
-          image: caddy:latest
-          volumes:
-            - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
-          ports:
-            - "80:80"
-            - "443:443"
-          restart: always
-
-  - path: /opt/keycloak/Caddyfile
-    permissions: '0644'
-    owner: root:root
-    content: |
-      ${KEYCLOAK_HOSTNAME} {
-        reverse_proxy 127.0.0.1:8080
-      }
 
 runcmd:
   - mkdir -p /opt/keycloak
@@ -47,4 +30,4 @@ runcmd:
   - systemctl start docker
   - sleep 5
   - docker-compose -f /opt/keycloak/docker-compose.yml up -d
-  - echo "Keycloak + Caddy deployment completed" >> /var/log/keycloak-init.log
+  - echo "Keycloak deployment completed" >> /var/log/keycloak-init.log
