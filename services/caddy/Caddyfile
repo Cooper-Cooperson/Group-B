@@ -1,0 +1,11 @@
+{
+	email admin@suitit.nl
+}
+
+chat.suitit.nl {
+	reverse_proxy mattermost:8065
+}
+
+meet.suitit.nl {
+	reverse_proxy jitsi-web:80
+}

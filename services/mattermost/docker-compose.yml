@@ -1,0 +1,36 @@
+services:
+  mattermost-db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mattermost
+      POSTGRES_PASSWORD: ${MM_DB_PASSWORD}
+      POSTGRES_DB: mattermost
+    volumes:
+      - mm_pg_data:/var/lib/postgresql/data
+    networks:
+      - proxy-net
+
+  mattermost:
+    image: mattermost/mattermost-team-edition:latest
+    restart: unless-stopped
+    depends_on:
+      - mattermost-db
+    environment:
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SQLSETTINGS_DATASOURCE: postgres://mattermost:${MM_DB_PASSWORD}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
+      MM_SERVICESETTINGS_SITEURL: https://chat.suitit.nl
+    volumes:
+      - mm_data:/mattermost/data
+      - mm_logs:/mattermost/logs
+    networks:
+      - proxy-net
+
+volumes:
+  mm_pg_data:
+  mm_data:
+  mm_logs:
+
+networks:
+  proxy-net:
+    external: true
