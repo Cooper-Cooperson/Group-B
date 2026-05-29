@@ -54,8 +54,8 @@ provider "ovh" {
 }
 provider "openstack" {
   auth_url    = "https://auth.cloud.ovh.net/"
-  region      = var.region
-  tenant_id   = var.ovh_project_id
+  region      = "UK1"
+  auth_type = "v3applicationcredential"
   application_credential_id     = var.application_credential_id
   application_credential_secret = var.application_credential_secret
 }
