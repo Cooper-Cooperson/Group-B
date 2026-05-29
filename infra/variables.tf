@@ -219,3 +219,11 @@ variable ssh_key_name_keycloack {
   description = "Name of the SSH key pair already registered in the OVHcloud project"
   type        = string
 }
+
+variable application_credential_id {
+  type = string
+}
+
+variable application_credential_secret {
+  type = string
+}

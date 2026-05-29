@@ -32,6 +32,10 @@ terraform {
       source  = "hashicorp/template"
       version = ">= 2.2.0"
     }
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = ">= 1.54.0"
+    }
   }
 }
 
@@ -47,6 +51,13 @@ provider "ovh" {
   application_key    = var.application_key
   application_secret = var.application_secret
   consumer_key       = var.consumer_key
+}
+provider "openstack" {
+  auth_url    = "https://auth.cloud.ovh.net/v3"
+  region      = var.region
+  tenant_id   = var.ovh_project_id
+  application_credential_id     = var.application_credential_id
+  application_credential_secret = var.application_credential_secret
 }
 
 /*
