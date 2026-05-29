@@ -140,7 +140,7 @@ Controlled by var.admin_ip_whitelist (max 5 entries, validated).
 */
 resource "ovh_ip_firewall_rule" "ssh_admin" {
   for_each = { for idx, cidr in var.admin_ip_whitelist : tostring(idx) => cidr }
-
+  timeout = 600 
   depends_on = [ovh_ip_firewall.server]
 
   ip               = local.public_ipv4
@@ -404,7 +404,7 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   service_name = var.ovh_project_id
   region       = var.region
   name         = "keycloak-vm"
-
+  timeout = 600 
   flavor {
     flavor_id = var.instance_flavor
   }
@@ -412,7 +412,7 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   boot_from {
     image_id = var.instance_image
   }
-  
+
   ssh_key {
     name = var.ssh_key_name_keycloack
   }
