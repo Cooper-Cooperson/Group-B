@@ -57,3 +57,9 @@ variable "consumer_key" {
   type        = string
   sensitive   = true
 }
+
+variable "endpoint" {
+  description = "OVH API endpoint — ovh-eu, ovh-us, or ovh-ca (GitHub secret: ENDPOINT)"
+  type        = string
+  default     = "ovh-eu"
+}
