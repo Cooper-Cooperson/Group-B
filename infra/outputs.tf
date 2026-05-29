@@ -97,11 +97,6 @@ output "instance_region" {
   value       = var.region
 }
 
-
-output "keycloak_vm_ip" {
-  value = openstack_compute_instance.keycloak_vm.access_ip_v4
-}
-
 output "keycloak_url" {
   value = "https://${var.keycloak_hostname}"
 }

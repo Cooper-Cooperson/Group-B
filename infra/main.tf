@@ -412,8 +412,10 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   boot_from {
     image_id = var.instance_image
   }
-
-  key_pair = var.ssh_key_name_keycloack
+  
+  ssh_key {
+    name = var.ssh_key_name_keycloack
+  }
   billing_period = "hourly"
   user_data       = data.template_file.cloud_init.rendered
 
