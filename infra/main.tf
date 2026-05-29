@@ -126,6 +126,8 @@ Enable the IP Firewall on the server's public IP
 */
 
 resource "ovh_ip_firewall" "server" {
+  depends_on = [ovh_cloud_project_instance.server]
+  
   ip             = local.public_ipv4
   ip_on_firewall = local.public_ipv4
   enabled        = true
@@ -140,7 +142,7 @@ Controlled by var.admin_ip_whitelist (max 5 entries, validated).
 */
 resource "ovh_ip_firewall_rule" "ssh_admin" {
   for_each = { for idx, cidr in var.admin_ip_whitelist : tostring(idx) => cidr }
-  timeout = 600 
+
   depends_on = [ovh_ip_firewall.server]
 
   ip               = local.public_ipv4
@@ -404,7 +406,7 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   service_name = var.ovh_project_id
   region       = var.region
   name         = "keycloak-vm"
-  timeout = 600 
+  
   flavor {
     flavor_id = var.instance_flavor
   }
