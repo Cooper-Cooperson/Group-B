@@ -1,6 +1,6 @@
 services:
   jitsi-web:
-    image: jitsi/web:latest
+    image: jitsi/web:stable-9220
     restart: unless-stopped
     environment:
       - PUBLIC_URL=https://meet.suitit.nl
@@ -15,7 +15,7 @@ services:
       - jitsi-net
 
   prosody:
-    image: jitsi/prosody:latest
+    image: jitsi/prosody:stable-9220
     restart: unless-stopped
     environment:
       - XMPP_DOMAIN=meet.suitit.nl
@@ -30,7 +30,7 @@ services:
       - jitsi-net
 
   jicofo:
-    image: jitsi/jicofo:latest
+    image: jitsi/jicofo:stable-9220
     restart: unless-stopped
     environment:
       - XMPP_SERVER=prosody
@@ -42,7 +42,7 @@ services:
       - jitsi-net
 
   jvb:
-    image: jitsi/jvb:latest
+    image: jitsi/jvb:stable-9220
     restart: unless-stopped
     ports:
       - "10000:10000/udp"
