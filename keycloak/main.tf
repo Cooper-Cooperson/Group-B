@@ -55,8 +55,8 @@ data "template_file" "cloud_init" {
     KEYCLOAK_VERSION   = var.keycloak_version
     KEYCLOAK_ADMIN     = var.keycloak_admin_user
     KEYCLOAK_PASSWORD  = var.keycloak_admin_password
-    KEYCLOAK_HOSTNAME  = var.keycloak_hostname
-    LETSENCRYPT_EMAIL  = "admin@${replace(var.keycloak_hostname, "/^[^.]+\\./", "")}"
+    #KEYCLOAK_HOSTNAME  = var.keycloak_hostname
+    #LETSENCRYPT_EMAIL  = "admin@${replace(var.keycloak_hostname, "/^[^.]+\\./", "")}"
   }
 }
 
