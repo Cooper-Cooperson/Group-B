@@ -99,11 +99,7 @@ output "instance_region" {
 
 
 output "keycloak_vm_ip" {
-  value = openstack_compute_instance_v2.keycloak_vm.access_ip_v4
-}
-
-output "loadbalancer_vip" {
-  value = openstack_lb_loadbalancer_v2.lb.vip_address
+  value = openstack_compute_instance.keycloak_vm.access_ip_v4
 }
 
 output "keycloak_url" {

@@ -32,10 +32,6 @@ terraform {
       source  = "hashicorp/template"
       version = ">= 2.2.0"
     }
-    openstack = {
-      source  = "terraform-provider-openstack/openstack"
-      version = ">= 1.54.0"
-    }
   }
 }
 
@@ -51,12 +47,6 @@ provider "ovh" {
   application_key    = var.application_key
   application_secret = var.application_secret
   consumer_key       = var.consumer_key
-}
-provider "openstack" {
-  auth_url    = "https://auth.cloud.ovh.net/v3"
-  region      = "UK1"
-  application_credential_id     = var.application_credential_id
-  application_credential_secret = var.application_credential_secret
 }
 
 /*
@@ -410,77 +400,24 @@ data "template_file" "cloud_init" {
   }
 }
 
-resource "openstack_compute_instance_v2" "keycloak_vm" {
-  name        = "keycloak-vm"
-  flavor_name = var.instance_flavor
+resource "ovh_cloud_project_instance" "keycloak_vm" {
+  service_name = var.ovh_project_id
+  region       = var.region
+  name         = "keycloak-vm"
 
-  block_device {
-    uuid                  = var.instance_image
-    source_type           = "image"
-    destination_type      = "local"
-    boot_index            = 0
-    delete_on_termination = true
+  flavor {
+    flavor_id = var.instance_flavor
+  }
+
+  boot_from {
+    image_id = var.instance_image
   }
 
   key_pair = var.ssh_key_name_keycloack
+  billing_period = "hourly"
+  user_data       = data.template_file.cloud_init.rendered
 
   network {
-    name        = ovh_cloud_project_network_private.network.name
-    fixed_ip_v4 = "192.168.168.101"
+    public = true
   }
-
-  user_data = data.template_file.cloud_init.rendered
-}
-
-data "openstack_networking_network_v2" "public" {
-  name = "Ext-Net"
-}
-
-resource "openstack_lb_loadbalancer_v2" "lb" {
-  name          = "keycloak-lb"
-  vip_network_id = data.openstack_networking_network_v2.public.id
-}
-
-# HTTP (80) passthrough to Caddy
-resource "openstack_lb_listener_v2" "http" {
-  name            = "keycloak-http"
-  protocol        = "TCP"
-  protocol_port   = 80
-  loadbalancer_id = openstack_lb_loadbalancer_v2.lb.id
-}
-
-resource "openstack_lb_pool_v2" "http_pool" {
-  name         = "keycloak-http-pool"
-  protocol     = "TCP"
-  lb_method = "ROUND_ROBIN"
-  listener_id  = openstack_lb_listener_v2.http.id
-}
-
-resource "openstack_lb_member_v2" "http_member" {
-  pool_id       = openstack_lb_pool_v2.http_pool.id
-  address       = "192.168.168.101"
-  protocol_port = 80
-  subnet_id     = ovh_cloud_project_network_private_subnet.subnet.id
-}
-
-# HTTPS (443) passthrough to Caddy
-resource "openstack_lb_listener_v2" "https" {
-  name            = "keycloak-https"
-  protocol        = "TCP"
-  protocol_port   = 443
-  loadbalancer_id = openstack_lb_loadbalancer_v2.lb.id
-}
-
-resource "openstack_lb_pool_v2" "https_pool" {
-  name         = "keycloak-https-pool"
-  protocol     = "TCP"
-  lb_method = "ROUND_ROBIN"
-  listener_id  = openstack_lb_listener_v2.https.id
-}
-
-resource "openstack_lb_member_v2" "https_member" {
-  pool_id       = openstack_lb_pool_v2.https_pool.id
-  address       = "192.168.168.101"
-  protocol_port = 443
-  subnet_id     = ovh_cloud_project_network_private_subnet.subnet.id
 }
