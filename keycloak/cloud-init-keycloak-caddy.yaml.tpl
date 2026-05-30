@@ -57,7 +57,10 @@ write_files:
 runcmd:
   - bash /usr/local/bin/install-docker.sh
   - mkdir -p /opt/keycloak/certs
-  - openssl req -x509 -newkey rsa:2048 -nodes -keyout /opt/keycloak/certs/key.pem -out /opt/keycloak/certs/cert.pem -days 365 -subj "/CN=keycloak.local"
-  - chmod 600 /opt/keycloak/certs/key.pem
+  - cd /opt/keycloak/certs
+  - openssl genpkey -algorithm RSA -out key.pem -pkeyopt rsa_keygen_bits:2048
+  - openssl req -new -key key.pem -out cert.csr -subj "/CN=keycloak.local"
+  - openssl x509 -req -days 365 -in cert.csr -signkey key.pem -out cert.pem
+  - chmod 600 key.pem
   - docker-compose -f /opt/keycloak/docker-compose.yml up -d
   - echo "Keycloak HTTPS deployment completed" >> /var/log/keycloak-init.log
