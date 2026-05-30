@@ -46,6 +46,8 @@ write_files:
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
             - "8080:8080"
+          networks:
+            - keycloaknet  
           restart: always
 
         caddy:
@@ -56,15 +58,18 @@ write_files:
           volumes:
             - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
             - /opt/keycloak/certs:/opt/keycloak/certs
+          networks:
+            - keycloaknet  
           restart: always
+          
   - path: /opt/keycloak/Caddyfile
     permissions: '0644'
     owner: root:root
     content: |
       :443 {
-        tls /opt/keycloak/certs/cert.pem /opt/keycloak/certs/key.pem
-        reverse_proxy 127.0.0.1:8080
-      }       
+      tls /opt/keycloak/certs/cert.pem /opt/keycloak/certs/key.pem
+      reverse_proxy keycloak:8080 
+      }   
 
 runcmd:
   - bash /usr/local/bin/install-docker.sh
