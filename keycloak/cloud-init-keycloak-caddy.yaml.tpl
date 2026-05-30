@@ -27,8 +27,11 @@ write_files:
       systemctl enable docker
       systemctl start docker
 
-      echo "[INFO] Docker installation complete."  
+      echo "[INFO] Docker installation complete." 
 
+      echo "[INFO] Starting OPENSSL installation."  
+      apt-get install openssl
+      
   - path: /opt/keycloak/docker-compose.yml
     permissions: '0644'
     owner: root:root
@@ -37,19 +40,24 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: start-dev --http-port=8080 --hostname-strict=false --hostname-strict-https=false
+          command: >
+            start-dev
+            --https-port=8443
+            --https-certificate-file=/opt/keycloak/certs/cert.pem
+            --https-certificate-key-file=/opt/keycloak/certs/key.pem
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
-            - "8080:8080"
+            - "8443:8443"
+          volumes:
+            - /opt/keycloak/certs:/opt/keycloak/certs
           restart: always
 
 runcmd:
-  - echo "[INFO] Running Docker installer..." >> /var/log/keycloak-init.log
-  - bash /usr/local/bin/install-docker.sh >> /var/log/keycloak-init.log 2>&1
-  - mkdir -p /opt/keycloak
-  - chown -R root:root /opt/keycloak
-  - sleep 5
+  - bash /usr/local/bin/install-docker.sh
+  - mkdir -p /opt/keycloak/certs
+  - openssl req -x509 -newkey rsa:2048 -nodes -keyout /opt/keycloak/certs/key.pem -out /opt/keycloak/certs/cert.pem -days 365 -subj "/CN=keycloak.local"
+  - chmod 600 /opt/keycloak/certs/key.pem
   - docker-compose -f /opt/keycloak/docker-compose.yml up -d
-  - echo "[INFO] Keycloak deployment completed." >> /var/log/keycloak-init.log
+  - echo "Keycloak HTTPS deployment completed" >> /var/log/keycloak-init.log
