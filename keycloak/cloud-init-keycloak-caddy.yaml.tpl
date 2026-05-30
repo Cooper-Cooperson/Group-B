@@ -45,9 +45,7 @@ write_files:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
-            - "8080:8080"
-          networks:
-            - keycloaknet  
+            - "8080:8080" 
           restart: always
 
         caddy:
@@ -58,10 +56,7 @@ write_files:
           volumes:
             - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
             - /opt/keycloak/certs:/opt/keycloak/certs
-          networks:
-            - keycloaknet  
           restart: always
-          
   - path: /opt/keycloak/Caddyfile
     permissions: '0644'
     owner: root:root
