@@ -67,9 +67,15 @@ write_files:
     content: |
       :443 {
         tls /opt/keycloak/certs/cert.pem /opt/keycloak/certs/key.pem
-        reverse_proxy keycloak:8080
+        
+        reverse_proxy keycloak:8080 {
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Port 443
+        }
       }
-
+      
 runcmd:
   - bash /usr/local/bin/install-docker.sh
 
