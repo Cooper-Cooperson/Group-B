@@ -40,27 +40,46 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: >
-            start-dev
-            --https-port=8443
-            --https-certificate-file=/opt/keycloak/certs/cert.pem
-            --https-certificate-key-file=/opt/keycloak/certs/key.pem
+          command: start-dev --http-port=8080
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
-            - "8443:8443"
+            - "8080:8080"
+          restart: always
+
+        caddy:
+          image: caddy:latest
+          ports:
+            - "80:80"
+            - "443:443"
           volumes:
+            - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
             - /opt/keycloak/certs:/opt/keycloak/certs
           restart: always
+  - path: /opt/keycloak/Caddyfile
+    permissions: '0644'
+    owner: root:root
+    content: |
+      :443 {
+        tls /opt/keycloak/certs/cert.pem /opt/keycloak/certs/key.pem
+        reverse_proxy 127.0.0.1:8080
+      }       
 
 runcmd:
   - bash /usr/local/bin/install-docker.sh
+  # Create certificate directory
   - mkdir -p /opt/keycloak/certs
-  - cd /opt/keycloak/certs
-  - openssl genpkey -algorithm RSA -out key.pem -pkeyopt rsa_keygen_bits:2048
-  - openssl req -new -key key.pem -out cert.csr -subj "/CN=keycloak.local"
-  - openssl x509 -req -days 365 -in cert.csr -signkey key.pem -out cert.pem
-  - chmod 600 key.pem
+  # Generate PKCS#8 private key
+  - openssl genpkey -algorithm RSA -out /opt/keycloak/certs/key.pem -pkeyopt rsa_keygen_bits:2048
+  # Create CSR
+  - openssl req -new -key /opt/keycloak/certs/key.pem -out /opt/keycloak/certs/cert.csr -subj "/CN=keycloak.local"
+  # Self-sign certificate
+  - openssl x509 -req -days 365 -in /opt/keycloak/certs/cert.csr -signkey /opt/keycloak/certs/key.pem -out /opt/keycloak/certs/cert.pem
+  # Set permissions
+  - chmod 600 /opt/keycloak/certs/key.pem
+  - chmod 644 /opt/keycloak/certs/cert.pem
+
+  # Start Keycloak + Caddy
   - docker-compose -f /opt/keycloak/docker-compose.yml up -d
-  - echo "Keycloak HTTPS deployment completed" >> /var/log/keycloak-init.log
+  - echo "Keycloak + Caddy HTTPS deployment completed" >> /var/log/keycloak-init.log
