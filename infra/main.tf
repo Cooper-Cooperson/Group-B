@@ -84,6 +84,10 @@ resource "ovh_cloud_project_instance" "server" {
   ssh_key {
     name = var.ssh_keypair_name
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 
@@ -352,7 +356,6 @@ chat.<domain>   → Mattermost (Team Chat)
 meet.<domain>   → Jitsi Meet (Video Conferencing)
 =============================================================================
 */
-/* Temporary commented to remove errors until domains have been deliverd
 resource "ovh_domain_zone_record" "services" {
   for_each = var.subdomains
 
@@ -369,4 +372,3 @@ resource "ovh_domain_zone_record" "services" {
 data "ovh_domain_zone" "main" {
   name = var.domain
 }
-*/
