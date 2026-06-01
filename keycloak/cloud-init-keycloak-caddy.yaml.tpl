@@ -39,7 +39,6 @@ write_files:
           command: > 
           start-dev
           --http-port=8080
-          --hostname=${PUBLIC_IP}
           --hostname-strict=false
           --hostname-strict-https=false
           --proxy-headers=xforwarded
@@ -85,10 +84,6 @@ write_files:
       }
       
 runcmd:
-  # Public IP
-  - PUBLIC_IP=$(curl -s https://api.ipify.org)
-  - echo "PUBLIC_IP=$PUBLIC_IP" > /opt/keycloak/.env
-  - docker-compose --env-file /opt/keycloak/.env -f /opt/keycloak/docker-compose.yml up -d
   - bash /usr/local/bin/install-docker.sh
 
   # Create certificate directory
