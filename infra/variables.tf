@@ -120,7 +120,7 @@ variable "instance_name" {
 variable "instance_flavor" {
   description = "OVHcloud instance flavor ID (e.g., b2-15, b2-30, b2-60)"
   type        = string
-  default     = "45ca263c-0373-4902-ab39-e5f0fc118190"
+  default     = "1feb4dbd-5cad-4315-8721-44deaf685f41"
 }
 
 variable "instance_image" {

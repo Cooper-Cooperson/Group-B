@@ -64,11 +64,11 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   name         = "keycloak-vm"
   
   flavor {
-    flavor_id = "1feb4dbd-5cad-4315-8721-44deaf685f41" #var.instance_flavor
+    flavor_id = var.instance_flavor
   }
 
   boot_from {
-    image_id = "d8ed87d0-1944-4f20-9108-cf21028ab9ba" #var.instance_image
+    image_id =  var.instance_image
   }
 
   ssh_key {
