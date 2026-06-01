@@ -1,0 +1,39 @@
+---
+- name: Fix MTU packet fragmentation (Fixes OVH TLS handshake timeouts to GitHub)
+  ansible.builtin.command: iptables -t mangle -I POSTROUTING -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+  changed_when: false
+
+
+- name: Clone Mailcow repository
+  ansible.builtin.git:
+    repo: https://github.com/mailcow/mailcow-dockerized.git
+    dest: "{{ mailcow_install_path }}"
+    version: master
+    update: yes
+
+- name: Check if mailcow.conf already exists
+  ansible.builtin.stat:
+    path: "{{ mailcow_install_path }}/mailcow.conf"
+  register: mailcow_conf
+
+- name: Generate Mailcow configuration
+  ansible.builtin.command:
+    cmd: ./generate_config.sh
+    chdir: "{{ mailcow_install_path }}"
+  environment:
+    MAILCOW_HOSTNAME: "{{ mailcow_hostname }}"
+    MAILCOW_TZ: "{{ mailcow_tz }}"
+  when: not mailcow_conf.stat.exists
+
+- name: Ensure TZ is correct in mailcow.conf
+  ansible.builtin.lineinfile:
+    path: "{{ mailcow_install_path }}/mailcow.conf"
+    regexp: '^TZ='
+    line: 'TZ={{ mailcow_tz }}'
+
+- name: Start Mailcow Docker Compose stack
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ mailcow_install_path }}"
+  register: docker_compose_up
+  changed_when: "'Created' in docker_compose_up.stdout or 'Started' in docker_compose_up.stdout"

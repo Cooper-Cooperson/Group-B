@@ -1,0 +1,7 @@
+---
+- name: Deploy Mailcow Server
+  hosts: mailserver
+  become: yes
+  roles:
+    - docker
+    - mailcow

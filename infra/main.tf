@@ -301,13 +301,26 @@ resource "ovh_ip_firewall_rule" "jitsi_webrtc" {
 
 /*
 -----------------------------------------------------------------------------
+Seq 18: Permit Established TCP Connections
+Required so that outbound connections (apt, git, curl) can receive return traffic.
+-----------------------------------------------------------------------------
+*/
+resource "ovh_ip_firewall_rule" "permit_established_tcp" {
+  depends_on = [ovh_ip_firewall.server]
+
+  ip             = local.public_ipv4
+  ip_on_firewall = local.public_ipv4
+  action         = "permit"
+  protocol       = "tcp"
+  sequence       = 18
+  tcp_option     = "established"
+}
+
+/*
+-----------------------------------------------------------------------------
 Seq 19: Default DENY — Catch-All for TCP
 Implements least-privilege: any TCP traffic not explicitly permitted above
 is denied at the OVH network edge.
-NOTE: The OVH IP Firewall is stateful — return traffic for outbound
-connections (apt updates, Docker pulls, SMTP delivery) is tracked and
-allowed automatically. This deny rule only blocks NEW unsolicited inbound
-TCP connections on non-permitted ports.
 -----------------------------------------------------------------------------
 */
 resource "ovh_ip_firewall_rule" "deny_all_tcp" {
