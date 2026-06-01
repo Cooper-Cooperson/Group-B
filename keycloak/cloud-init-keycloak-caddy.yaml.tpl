@@ -44,29 +44,27 @@ write_files:
             --hostname-strict-https=false
             --proxy-headers=xforwarded
             --features=hostname:v1
-
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
           ports:
             - "8080:8080"
-
           networks:
             - keycloaknet
-
           restart: always
 
-      caddy:
-        image: caddy:latest
-        ports:
-          - "80:80"
-          - "443:443"
-        volumes:
-          - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
-          - /opt/keycloak/certs:/opt/keycloak/certs
-        networks:
-          - keycloaknet
-        restart: always
+        caddy:
+          image: caddy:latest
+          ports:
+            - "80:80"
+            - "443:443"
+          volumes:
+            - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
+            - /opt/keycloak/certs:/opt/keycloak/certs
+          networks:
+            - keycloaknet
+          restart: always
+
       networks:
         keycloaknet:
 
@@ -76,16 +74,16 @@ write_files:
     content: |
       :443 {
         tls /opt/keycloak/certs/cert.pem /opt/keycloak/certs/key.pem
-        
+
         reverse_proxy keycloak:8080 {
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-Host {host}
-        header_up X-Forwarded-Port 443
-        header_up Forwarded "proto=https;host={host};port=443"
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto https
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Port 443
+          header_up Forwarded "proto=https;host={host};port=443"
         }
       }
-      
+
 runcmd:
   - bash /usr/local/bin/install-docker.sh
 
