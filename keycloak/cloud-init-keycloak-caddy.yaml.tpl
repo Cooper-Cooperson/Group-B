@@ -36,19 +36,19 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: > 
-           bash -c '
-            PUBLIC_IP=$(curl -s http://checkip.amazonaws.com);
-            echo "Using PUBLIC_IP=$PUBLIC_IP";
-            /opt/keycloak/bin/kc.sh start-dev \
-            start-dev\
-            --http-port=8080 \
-            --hostname=$PUBLIC_IP \
-            --hostname-strict=false \
-            --hostname-strict-https=false \
-            --proxy-headers=xforwarded \
-            --features=hostname:v1
-        environment:
+          command: >
+            bash -c "
+              PUBLIC_IP=$(curl -s http://checkip.amazonaws.com);
+              echo Using PUBLIC_IP=$PUBLIC_IP;
+              /opt/keycloak/bin/kc.sh start-dev
+                --http-port=8080
+                --hostname=$PUBLIC_IP
+                --hostname-strict=false
+                --hostname-strict-https=false
+                --proxy-headers=xforwarded
+                --features=hostname:v1
+                "
+          environment:
           KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
           KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
         ports:
