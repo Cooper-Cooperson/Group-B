@@ -352,7 +352,7 @@ chat.<domain>   → Mattermost (Team Chat)
 meet.<domain>   → Jitsi Meet (Video Conferencing)
 =============================================================================
 */
-/* Temporary commented to remove errors until domains have been deliverd
+# Domains have been delivered.
 resource "ovh_domain_zone_record" "services" {
   for_each = var.subdomains
 
@@ -369,4 +369,3 @@ resource "ovh_domain_zone_record" "services" {
 data "ovh_domain_zone" "main" {
   name = var.domain
 }
-*/
