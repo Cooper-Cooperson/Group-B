@@ -2,14 +2,25 @@
 	email admin@suitit.nl
 }
 
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+	}
+}
+
 chat.suitit.nl {
+	import security_headers
 	reverse_proxy mattermost:8065
 }
 
 meet.suitit.nl {
+	import security_headers
 	reverse_proxy jitsi-web:80
 }
 
 mail.suitit.nl {
+	import security_headers
 	reverse_proxy host.docker.internal:8080
 }
