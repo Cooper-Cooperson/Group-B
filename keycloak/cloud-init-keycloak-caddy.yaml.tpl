@@ -32,49 +32,49 @@ write_files:
     permissions: '0644'
     owner: root:root
     content: |
-    version: '3.8'
-    services:
-      keycloak:
-        image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-        command: >
-          start-dev
-          --http-port=8080
-          --hostname=54.37.78.227
-          --hostname-strict=false
-          --hostname-strict-https=false
-          --proxy-headers=xforwarded
-          --features=hostname:v1
+      version: '3.8'
+      services:
+        keycloak:
+          image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+          command: >
+            start-dev
+            --http-port=8080
+            --hostname=54.37.78.227
+            --hostname-strict=false
+            --hostname-strict-https=false
+            --proxy-headers=xforwarded
+            --features=hostname:v1
 
-        environment:
-          KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-          KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+          environment:
+            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
 
-      ports:
-        - "8080:8080"
+        ports:
+          - "8080:8080"
+
+        networks:
+          - keycloaknet
+
+        restart: always
+
+      caddy:
+        image: caddy:latest
+
+        ports:
+          - "80:80"
+          - "443:443"
+
+        volumes:
+          - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
+          - /opt/keycloak/certs:/opt/keycloak/certs
+
+        networks:
+          - keycloaknet
+
+        restart: always
 
       networks:
-        - keycloaknet
-
-      restart: always
-
-    caddy:
-      image: caddy:latest
-
-      ports:
-        - "80:80"
-        - "443:443"
-
-      volumes:
-        - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
-        - /opt/keycloak/certs:/opt/keycloak/certs
-
-      networks:
-        - keycloaknet
-
-      restart: always
-
-    networks:
-      keycloaknet:
+        keycloaknet:
 
   - path: /opt/keycloak/Caddyfile
     permissions: '0644'
