@@ -36,15 +36,22 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: start-dev --http-port=8080
-          environment:
-            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-          ports:
-            - "8080:8080"
-          networks:
-            - keycloaknet
-          restart: always
+          command: > 
+          start-dev
+          --http-port=8080
+          --hostname=54.37.78.227
+          --hostname-strict=false
+          --hostname-strict-https=false
+          --proxy-headers=xforwarded
+          --features=hostname:v1
+        environment:
+          KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+          KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+        ports:
+          - "8080:8080"
+        networks:
+          - keycloaknet
+        restart: always
 
         caddy:
           image: caddy:latest
@@ -73,6 +80,7 @@ write_files:
         header_up X-Forwarded-Proto https
         header_up X-Forwarded-Host {host}
         header_up X-Forwarded-Port 443
+        header_up Forwarded "proto=https;host={host};port=443"
         }
       }
       
