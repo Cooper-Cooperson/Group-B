@@ -9,3 +9,7 @@ chat.suitit.nl {
 meet.suitit.nl {
 	reverse_proxy jitsi-web:80
 }
+
+mail.suitit.nl {
+	reverse_proxy host.docker.internal:8080
+}
