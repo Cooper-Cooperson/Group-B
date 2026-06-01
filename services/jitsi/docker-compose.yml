@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       - PUBLIC_URL=https://meet.suitit.nl
+      - DISABLE_HTTPS=1
       - XMPP_SERVER=prosody
       - XMPP_BOSH_URL_BASE=http://prosody:5280
       - JICOFO_AUTH_USER=focus
