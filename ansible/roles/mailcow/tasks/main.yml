@@ -10,6 +10,7 @@
     dest: "{{ mailcow_install_path }}"
     version: master
     update: yes
+    force: yes
 
 - name: Check if mailcow.conf already exists
   ansible.builtin.stat:
@@ -17,12 +18,12 @@
   register: mailcow_conf
 
 - name: Generate Mailcow configuration
-  ansible.builtin.command:
-    cmd: ./generate_config.sh
+  ansible.builtin.shell: |
+    export MAILCOW_HOSTNAME="{{ mailcow_hostname }}"
+    export MAILCOW_TZ="{{ mailcow_tz }}"
+    yes '' | ./generate_config.sh
+  args:
     chdir: "{{ mailcow_install_path }}"
-  environment:
-    MAILCOW_HOSTNAME: "{{ mailcow_hostname }}"
-    MAILCOW_TZ: "{{ mailcow_tz }}"
   when: not mailcow_conf.stat.exists
 
 - name: Ensure TZ is correct in mailcow.conf

@@ -30,6 +30,7 @@
       - gnupg
       - lsb-release
       - git
+      - jq
     state: present
 
 - name: Ensure keyrings directory exists
