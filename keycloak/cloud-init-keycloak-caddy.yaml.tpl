@@ -39,6 +39,7 @@ write_files:
           command: > 
           start-dev
           --http-port=8080
+          --hostname=54.37.78.227
           --hostname-strict=false
           --hostname-strict-https=false
           --proxy-headers=xforwarded
