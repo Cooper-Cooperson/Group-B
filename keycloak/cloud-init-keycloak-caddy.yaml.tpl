@@ -36,26 +36,22 @@ write_files:
       services:
         keycloak:
           image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
-          command: >
-            bash -c "
-              PUBLIC_IP=$(curl -s http://checkip.amazonaws.com);
-              echo Using PUBLIC_IP=$PUBLIC_IP;
-              /opt/keycloak/bin/kc.sh start-dev
-                --http-port=8080
-                --hostname=$PUBLIC_IP
-                --hostname-strict=false
-                --hostname-strict-https=false
-                --proxy-headers=xforwarded
-                --features=hostname:v1
-                "
-          environment:
-            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-          ports:
-            - "8080:8080"
-          networks:
-            - keycloaknet
-          restart: always
+          command: > 
+          start-dev
+          --http-port=8080
+          --hostname=${PUBLIC_IP}
+          --hostname-strict=false
+          --hostname-strict-https=false
+          --proxy-headers=xforwarded
+          --features=hostname:v1
+        environment:
+          KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+          KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+        ports:
+          - "8080:8080"
+        networks:
+          - keycloaknet
+        restart: always
 
         caddy:
           image: caddy:latest
@@ -68,6 +64,9 @@ write_files:
           networks:
             - keycloaknet
           restart: always
+
+      networks:
+        keycloaknet:
 
   - path: /opt/keycloak/Caddyfile
     permissions: '0644'
@@ -86,6 +85,10 @@ write_files:
       }
       
 runcmd:
+  # Public IP
+  - PUBLIC_IP=$(curl -s https://api.ipify.org)
+  - echo "PUBLIC_IP=$PUBLIC_IP" > /opt/keycloak/.env
+  - docker-compose --env-file /opt/keycloak/.env -f /opt/keycloak/docker-compose.yml up -d
   - bash /usr/local/bin/install-docker.sh
 
   # Create certificate directory
