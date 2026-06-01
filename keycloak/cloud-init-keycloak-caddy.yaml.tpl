@@ -48,31 +48,25 @@ write_files:
           environment:
             KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
             KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+          ports:
+            - "8080:8080"
 
-        ports:
-          - "8080:8080"
+          networks:
+            - keycloaknet
 
-        networks:
-          - keycloaknet
-
-        restart: always
+          restart: always
 
       caddy:
         image: caddy:latest
-
         ports:
           - "80:80"
           - "443:443"
-
         volumes:
           - /opt/keycloak/Caddyfile:/etc/caddy/Caddyfile
           - /opt/keycloak/certs:/opt/keycloak/certs
-
         networks:
           - keycloaknet
-
         restart: always
-
       networks:
         keycloaknet:
 
