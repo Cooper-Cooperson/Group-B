@@ -49,13 +49,13 @@ write_files:
                 --features=hostname:v1
                 "
           environment:
-          KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-          KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-        ports:
-          - "8080:8080"
-        networks:
-          - keycloaknet
-        restart: always
+            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+          ports:
+            - "8080:8080"
+          networks:
+            - keycloaknet
+          restart: always
 
         caddy:
           image: caddy:latest
@@ -68,9 +68,6 @@ write_files:
           networks:
             - keycloaknet
           restart: always
-
-      networks:
-        keycloaknet:
 
   - path: /opt/keycloak/Caddyfile
     permissions: '0644'
