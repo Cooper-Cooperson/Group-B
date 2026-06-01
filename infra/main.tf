@@ -367,8 +367,3 @@ resource "ovh_domain_zone_record" "services" {
 }
 
 
-#Retrieve zone metadata (nameservers) for output
-
-data "ovh_domain_zone" "main" {
-  name = var.domain
-}
