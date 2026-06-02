@@ -6,7 +6,7 @@ services:
       - PUBLIC_URL=https://meet.suitit.tech
       - DISABLE_HTTPS=1
       - XMPP_SERVER=prosody
-      - XMPP_BOSH_URL_BASE=http://prosody:5280
+      - XMPP_BOSH_URL_BASE=https://meet.suitit.tech
       - JICOFO_AUTH_USER=focus
       - TZ=Europe/Amsterdam
     volumes:
@@ -30,7 +30,10 @@ services:
     volumes:
       - prosody_config:/config
     networks:
-      - jitsi-net
+      proxy-net:
+        aliases:
+          - prosody
+      jitsi-net:
 
   jicofo:
     image: jitsi/jicofo:stable-9220

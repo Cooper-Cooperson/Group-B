@@ -17,7 +17,18 @@ chat.suitit.tech {
 
 meet.suitit.tech {
 	import security_headers
-	reverse_proxy jitsi-web:80
+
+	handle /http-bind* {
+		reverse_proxy prosody:5280
+	}
+
+	handle /xmpp-websocket* {
+		reverse_proxy prosody:5280
+	}
+
+	handle {
+		reverse_proxy jitsi-web:80
+	}
 }
 
 mail.suitit.tech {
