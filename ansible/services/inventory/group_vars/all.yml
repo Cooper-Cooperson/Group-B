@@ -1,0 +1,4 @@
+---
+mm_db_password: "testpass"
+jicofo_auth_password: "testpass"
+jvb_auth_password: "testpass"

@@ -1,0 +1,73 @@
+---
+- name: Create service directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/services
+    - /opt/services/caddy
+    - /opt/services/mattermost
+    - /opt/services/jitsi
+
+- name: Copy Caddy base compose file
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../services/docker-compose.base.yml"
+    dest: /opt/services/docker-compose.base.yml
+    mode: '0644'
+
+- name: Copy Caddyfile
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../services/caddy/Caddyfile"
+    dest: /opt/services/caddy/Caddyfile
+    mode: '0644'
+
+- name: Copy Mattermost compose file
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../services/mattermost/docker-compose.yml"
+    dest: /opt/services/mattermost/docker-compose.yml
+    mode: '0644'
+
+- name: Copy Jitsi compose file
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../services/jitsi/docker-compose.yml"
+    dest: /opt/services/jitsi/docker-compose.yml
+    mode: '0644'
+
+- name: Write .env file for Mattermost
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /opt/services/mattermost/.env
+    mode: '0600'
+
+- name: Write .env file for Jitsi
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /opt/services/jitsi/.env
+    mode: '0600'
+
+- name: Create proxy-net Docker network
+  ansible.builtin.command: docker network create proxy-net
+  register: network_result
+  changed_when: network_result.rc == 0
+  failed_when: network_result.rc != 0 and 'already exists' not in network_result.stderr
+
+- name: Start Caddy stack
+  ansible.builtin.command:
+    cmd: docker compose -f /opt/services/docker-compose.base.yml up -d
+  register: caddy_up
+  changed_when: "'Created' in caddy_up.stdout or 'Started' in caddy_up.stdout"
+
+- name: Start Mattermost stack
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: /opt/services/mattermost
+  register: mm_up
+  changed_when: "'Created' in mm_up.stdout or 'Started' in mm_up.stdout"
+
+- name: Start Jitsi stack
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: /opt/services/jitsi
+  register: jitsi_up
+  changed_when: "'Created' in jitsi_up.stdout or 'Started' in jitsi_up.stdout"
