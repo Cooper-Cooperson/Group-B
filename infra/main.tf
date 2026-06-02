@@ -322,25 +322,6 @@ resource "ovh_ip_firewall_rule" "jitsi_webrtc" {
 
 /*
 -----------------------------------------------------------------------------
-Seq 13: WireGuard VPN (Port 51820/UDP) — Restricted to pfSense WAN IP
-Allows the on-premise pfSense router on ESXi to build a secure tunnel 
-directly to the single-node server.
------------------------------------------------------------------------------
-*/
-resource "ovh_ip_firewall_rule" "wireguard_vpn" {
-  depends_on = [ovh_ip_firewall.server]
-
-  ip               = local.public_ipv4
-  ip_on_firewall   = local.public_ipv4
-  action           = "permit"
-  protocol         = "udp"
-  sequence         = 13
-  destination_port = "51820"
-  source           = var.pfsense_public_ip
-}
-
-/*
------------------------------------------------------------------------------
 Seq 18: Permit Established TCP Connections
 Required so that outbound connections (apt, git, curl) can receive return traffic.
 -----------------------------------------------------------------------------
