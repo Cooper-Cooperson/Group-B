@@ -196,6 +196,23 @@ resource "ovh_ip_firewall_rule" "https" {
 
 /*
 -----------------------------------------------------------------------------
+Seq 16: HTTPS-ALT (Port 8443/TCP) — Temporary Mailcow UI
+Temporary access for Mailcow UI until Caddy is installed.
+-----------------------------------------------------------------------------
+*/
+resource "ovh_ip_firewall_rule" "https_alt" {
+  depends_on = [ovh_ip_firewall.server]
+
+  ip               = local.public_ipv4
+  ip_on_firewall   = local.public_ipv4
+  action           = "permit"
+  protocol         = "tcp"
+  sequence         = 16
+  destination_port = "8443"
+}
+
+/*
+-----------------------------------------------------------------------------
 Seq 7: SMTP (Port 25/TCP) — Open to All
 Inbound email delivery. Mailcow must receive mail from any MTA on the
 internet. Blocking this would prevent receiving emails entirely.
