@@ -22,5 +22,9 @@ meet.suitit.nl {
 
 mail.suitit.nl {
 	import security_headers
-	reverse_proxy host.docker.internal:8080
+	reverse_proxy host.docker.internal:8443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
 }
