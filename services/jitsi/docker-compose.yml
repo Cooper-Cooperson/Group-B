@@ -3,7 +3,7 @@ services:
     image: jitsi/web:stable-9220
     restart: unless-stopped
     environment:
-      - PUBLIC_URL=https://meet.suitit.nl
+      - PUBLIC_URL=https://meet.suitit.tech
       - DISABLE_HTTPS=1
       - XMPP_SERVER=prosody
       - XMPP_BOSH_URL_BASE=http://prosody:5280
@@ -19,7 +19,7 @@ services:
     image: jitsi/prosody:stable-9220
     restart: unless-stopped
     environment:
-      - XMPP_DOMAIN=meet.suitit.nl
+      - XMPP_DOMAIN=meet.suitit.tech
       - JICOFO_AUTH_USER=focus
       - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD}
       - JVB_AUTH_USER=jvb
@@ -35,7 +35,7 @@ services:
     restart: unless-stopped
     environment:
       - XMPP_SERVER=prosody
-      - XMPP_DOMAIN=meet.suitit.nl
+      - XMPP_DOMAIN=meet.suitit.tech
       - JICOFO_AUTH_USER=focus
       - JICOFO_AUTH_PASSWORD=${JICOFO_AUTH_PASSWORD}
       - TZ=Europe/Amsterdam
@@ -49,7 +49,7 @@ services:
       - "10000:10000/udp"
     environment:
       - XMPP_SERVER=prosody
-      - XMPP_DOMAIN=meet.suitit.nl
+      - XMPP_DOMAIN=meet.suitit.tech
       - JVB_AUTH_USER=jvb
       - JVB_AUTH_PASSWORD=${JVB_AUTH_PASSWORD}
       - DOCKER_HOST_ADDRESS=${DOCKER_HOST_ADDRESS}

@@ -6,9 +6,9 @@ Automates Docker installation and deployment of the services stack on the server
 
 | Service | URL |
 |---|---|
-| Caddy (reverse proxy) | `chat.suitit.nl`, `meet.suitit.nl`, `mail.suitit.nl` |
-| Mattermost | `chat.suitit.nl` |
-| Jitsi Meet | `meet.suitit.nl` |
+| Caddy (reverse proxy) | `chat.suitit.tech`, `meet.suitit.tech`, `mail.suitit.tech` |
+| Mattermost | `chat.suitit.tech` |
+| Jitsi Meet | `meet.suitit.tech` |
 
 ## What it does
 

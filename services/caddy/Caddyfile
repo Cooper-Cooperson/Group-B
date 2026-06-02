@@ -1,5 +1,5 @@
 {
-	email admin@suitit.nl
+	email admin@suitit.tech
 }
 
 (security_headers) {
@@ -10,17 +10,17 @@
 	}
 }
 
-chat.suitit.nl {
+chat.suitit.tech {
 	import security_headers
 	reverse_proxy mattermost:8065
 }
 
-meet.suitit.nl {
+meet.suitit.tech {
 	import security_headers
 	reverse_proxy jitsi-web:80
 }
 
-mail.suitit.nl {
+mail.suitit.tech {
 	import security_headers
 	reverse_proxy host.docker.internal:8443 {
 		transport http {

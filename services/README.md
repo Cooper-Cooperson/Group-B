@@ -2,8 +2,8 @@
 
 Caddy reverse proxy + Mattermost + Jitsi Meet, deployed via Docker Compose on OVHcloud.
 
-- `chat.suitit.nl` → Mattermost (replaces Teams chat)
-- `meet.suitit.nl` → Jitsi Meet (replaces Teams video)
+- `chat.suitit.tech` → Mattermost (replaces Teams chat)
+- `meet.suitit.tech` → Jitsi Meet (replaces Teams video)
 
 HTTPS is handled automatically by Caddy (Let's Encrypt). Only ports 80, 443, and UDP 10000 are exposed.
 
@@ -30,7 +30,7 @@ docker compose \
 ## Verify
 
 ```bash
-curl -I https://chat.suitit.nl  # 200 OK + valid cert
-curl -I https://meet.suitit.nl  # 200 OK + valid cert
+curl -I https://chat.suitit.tech  # 200 OK + valid cert
+curl -I https://meet.suitit.tech  # 200 OK + valid cert
 nmap -p 8065 <server-ip>        # should be filtered/closed
 ```

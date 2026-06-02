@@ -142,7 +142,7 @@ Set as a GitHub secret or TF_VAR_domain in your workflow.
 -----------------------------------------------------------------------------
 */
 variable "domain" {
-  description = "Root domain name managed in OVHcloud DNS (e.g., suitit.nl)"
+  description = "Root domain name managed in OVHcloud DNS (e.g., suitit.tech)"
   type        = string
 }
 

@@ -54,11 +54,11 @@ provider "ovh" {
 SECTION 1: COMPUTE INSTANCE
 =============================================================================
 Single-node server running the entire stack via Docker Compose:
-• Keycloak     (auth.suitit.nl)   — IAM / SSO
-• Nextcloud    (files.suitit.nl)  — File storage & collaboration
-• Mailcow      (mail.suitit.nl)   — Email server
-• Mattermost   (chat.suitit.nl)   — Team messaging
-• Jitsi Meet   (meet.suitit.nl)   — Video conferencing
+• Keycloak     (auth.suitit.tech)   — IAM / SSO
+• Nextcloud    (files.suitit.tech)  — File storage & collaboration
+• Mailcow      (mail.suitit.tech)   — Email server
+• Mattermost   (chat.suitit.tech)   — Team messaging
+• Jitsi Meet   (meet.suitit.tech)   — Video conferencing
 • Traefik/Nginx                  — Reverse proxy + TLS termination
 =============================================================================
 */

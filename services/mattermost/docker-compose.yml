@@ -19,7 +19,7 @@ services:
     environment:
       MM_SQLSETTINGS_DRIVERNAME: postgres
       MM_SQLSETTINGS_DATASOURCE: postgres://mattermost:${MM_DB_PASSWORD}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
-      MM_SERVICESETTINGS_SITEURL: https://chat.suitit.nl
+      MM_SERVICESETTINGS_SITEURL: https://chat.suitit.tech
     volumes:
       - mm_data:/mattermost/data
       - mm_logs:/mattermost/logs
