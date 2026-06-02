@@ -50,6 +50,7 @@ jobs:
           ssh_keypair_name = "${{ secrets.SSH_KEYPAIR_NAME }}"
           keycloak_version = "${{ secrets.KEYCLOAK_VERSION }}"
           ssh_key_name_keycloack = "${{ secrets.SSH_KEY_NAME_KEYCLOACK }}"
+          storage_container_name = "${{ secrets.STORAGE_CONTAINER_NAME }}"
           EOF
 
       - name: Export OpenStack credentials
