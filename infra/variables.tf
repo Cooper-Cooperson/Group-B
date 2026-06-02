@@ -219,22 +219,3 @@ variable ssh_key_name_keycloack {
   description = "Name of the SSH key pair already registered in the OVHcloud project"
   type        = string
 }
-
-/*
------------------------------------------------------------------------------
-Firewall — On-Premise pfSense VPN Ingress Whitelist
-Specifies the public WAN IP address of the on-premise pfSense router 
-running on the ESXi host. Used to restrict access to the WireGuard VPN 
-port (51820/UDP) to your specific location only.
-Set as TF_VAR_pfsense_public_ip='x.x.x.x/32' in your GitHub workflow.
------------------------------------------------------------------------------
-*/
-variable "pfsense_public_ip" {
-  description = "145.220.75.91/32"
-  type        = string
-
-  validation {
-    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}/32$", var.pfsense_public_ip))
-    error_message = "The pfsense_public_ip must be a valid IPv4 address with a strict /32 subnet mask (e.g., '203.0.113.50/32')."
-  }
-}
