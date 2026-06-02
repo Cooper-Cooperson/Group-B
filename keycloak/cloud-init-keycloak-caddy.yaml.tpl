@@ -39,7 +39,7 @@ write_files:
           command: >
             start-dev
             --http-port=8080
-            --hostname=54.37.78.227
+            --hostname=__PUBLIC_IP__
             --hostname-strict=false
             --hostname-strict-https=false
             --proxy-headers=xforwarded
@@ -102,6 +102,10 @@ runcmd:
   # Set permissions
   - chmod 600 /opt/keycloak/certs/key.pem
   - chmod 644 /opt/keycloak/certs/cert.pem
+
+  # Inject public IP into docker-compose.yml
+  - PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
+  - sed -i "s/__PUBLIC_IP__/$PUBLIC_IP/" /opt/keycloak/docker-compose.yml
 
   # Start Keycloak + Caddy
   - docker-compose -f /opt/keycloak/docker-compose.yml up -d
