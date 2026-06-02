@@ -67,7 +67,7 @@ variable "ovh_project_id" {
 }
 
 variable "region" {
-  type        = string
+  type = string
 }
 
 /*
@@ -179,7 +179,7 @@ Set as TF_VAR_admin_ip_whitelist='["x.x.x.x/32"]' in your GitHub workflow.
 variable "admin_ip_whitelist" {
   description = "List of CIDR blocks allowed SSH access (port 22). Example: ['203.0.113.10/32', '198.51.100.0/24']WARNING: Never set this to ['0.0.0.0/0'] in production!"
   type        = list(string)
-  default     = ["0.0.0.0/0"]  # ⚠ TESTING ONLY — replace with real admin IPs before production!
+  default     = ["0.0.0.0/0"] # ⚠ TESTING ONLY — replace with real admin IPs before production!
 
   validation {
     condition     = length(var.admin_ip_whitelist) > 0
@@ -199,23 +199,41 @@ Used by the Helm chart to configure the Keycloak admin account and ingress.
 -----------------------------------------------------------------------------
 */
 
-variable keycloak_admin_user {
+variable "keycloak_admin_user" {
   type = string
 }
 
-variable keycloak_admin_password {
+variable "keycloak_admin_password" {
   type = string
 }
 
-variable keycloak_hostname {
+variable "keycloak_hostname" {
   type = string
 }
 
-variable keycloak_version {
+variable "keycloak_version" {
   type = string
 }
 
-variable ssh_key_name_keycloack {
+variable "ssh_key_name_keycloack" {
   description = "Name of the SSH key pair already registered in the OVHcloud project"
   type        = string
+}
+
+/*
+-----------------------------------------------------------------------------
+Storage Configuration — Personal & Shared File Storage Backend
+Defines the unique identifier and name for the high-availability 
+OVHcloud Object Storage container used by the Nextcloud application layer.
+-----------------------------------------------------------------------------
+*/
+variable "storage_container_name" {
+  description = "The name of the high-availability OVHcloud storage container used for shared and personal data"
+  type        = string
+  default     = "suitit-workspace-storage"
+
+  validation {
+    condition     = length(var.storage_container_name) >= 3 && length(var.storage_container_name) <= 63
+    error_message = "The storage_container_name must be between 3 and 63 characters long to comply with S3 naming standards."
+  }
 }
