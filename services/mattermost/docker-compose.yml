@@ -24,7 +24,9 @@ services:
       - mm_data:/mattermost/data
       - mm_logs:/mattermost/logs
     networks:
-      - proxy-net
+      proxy-net:
+        aliases:
+          - mattermost
 
 volumes:
   mm_pg_data:

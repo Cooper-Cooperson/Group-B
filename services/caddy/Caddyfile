@@ -12,12 +12,12 @@
 
 chat.suitit.tech {
 	import security_headers
-	reverse_proxy mattermost-mattermost-1:8065
+	reverse_proxy mattermost:8065
 }
 
 meet.suitit.tech {
 	import security_headers
-	reverse_proxy jitsi-jitsi-web-1:80
+	reverse_proxy jitsi-web:80
 }
 
 mail.suitit.tech {

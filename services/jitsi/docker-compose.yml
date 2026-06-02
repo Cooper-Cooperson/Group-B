@@ -12,8 +12,10 @@ services:
     volumes:
       - jitsi_web_config:/config
     networks:
-      - proxy-net
-      - jitsi-net
+      proxy-net:
+        aliases:
+          - jitsi-web
+      jitsi-net:
 
   prosody:
     image: jitsi/prosody:stable-9220
