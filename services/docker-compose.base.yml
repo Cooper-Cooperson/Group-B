@@ -20,4 +20,4 @@ volumes:
 
 networks:
   proxy-net:
-    driver: bridge
+    external: true
