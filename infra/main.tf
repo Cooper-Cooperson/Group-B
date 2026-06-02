@@ -399,5 +399,5 @@ integrated with Keycloak IAM.
 resource "ovh_cloud_project_storage" "file_storage" {
   service_name = var.ovh_project_id
   name         = var.storage_container_name
-  region_name  = var.region
+  region_name  = upper(var.region)
 }
