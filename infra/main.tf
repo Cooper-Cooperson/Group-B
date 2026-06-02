@@ -21,7 +21,7 @@ terraform {
 
   required_providers {
     ovh = {
-      source = "ovh/ovh"
+      source  = "ovh/ovh"
       version = ">= 2.1.0"
     }
     kubernetes = {
@@ -383,4 +383,21 @@ resource "ovh_domain_zone_record" "services" {
   target    = local.public_ipv4
 }
 
+/*
+=============================================================================
+SECTION 4: OBJECT STORAGE (Shared & Personal File Storage Backend)
+=============================================================================
+Provisions an OVHcloud High-Availability Object Storage Container (S3 API).
+This container serves as the primary data storage backend for Nextcloud
+(files.suitit.nl), completely handling the "Personal and shared file storage 
+functionality" requirement.
+Access control is restricted and managed via the Nextcloud application layer
+integrated with Keycloak IAM.
+=============================================================================
+*/
 
+resource "ovh_cloud_project_storage" "file_storage" {
+  service_name = var.ovh_project_id
+  name         = var.storage_container_name
+  region_name  = var.region
+}

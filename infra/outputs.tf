@@ -100,3 +100,20 @@ output "instance_region" {
 output "keycloak_url" {
   value = "https://${var.keycloak_hostname}"
 }
+
+/*
+-----------------------------------------------------------------------------
+Storage Backend Metadata — Backend Reference Data
+Provides details required by the Docker Compose environment to connect 
+Nextcloud to the newly provisioned OVHcloud storage backend.
+-----------------------------------------------------------------------------
+*/
+output "storage_container_name" {
+  description = "The name of the provisioned OVHcloud storage container"
+  value       = ovh_cloud_project_storage.file_storage.name
+}
+
+output "storage_container_url" {
+  description = "The high-availability endpoint URL for the storage container"
+  value       = "https://s3.${var.region}.io.cloud.ovh.net/"
+}
