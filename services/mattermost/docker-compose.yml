@@ -9,7 +9,7 @@ services:
     volumes:
       - mm_pg_data:/var/lib/postgresql/data
     networks:
-      - proxy-net
+      - mm-internal
 
   mattermost:
     image: mattermost/mattermost-team-edition:latest
@@ -27,6 +27,7 @@ services:
       proxy-net:
         aliases:
           - mattermost
+      mm-internal:
 
 volumes:
   mm_pg_data:
@@ -36,3 +37,5 @@ volumes:
 networks:
   proxy-net:
     external: true
+  mm-internal:
+    driver: bridge
