@@ -20,6 +20,12 @@ services:
       MM_SQLSETTINGS_DRIVERNAME: postgres
       MM_SQLSETTINGS_DATASOURCE: postgres://mattermost:${MM_DB_PASSWORD}@mattermost-db:5432/mattermost?sslmode=disable&connect_timeout=10
       MM_SERVICESETTINGS_SITEURL: https://chat.suitit.tech
+      MM_GITLABSETTINGS_ENABLE: "true"
+      MM_GITLABSETTINGS_ID: "${MM_OIDC_CLIENT_ID}"
+      MM_GITLABSETTINGS_SECRET: "${MM_OIDC_CLIENT_SECRET}"
+      MM_GITLABSETTINGS_AUTHENDPOINT: "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth"
+      MM_GITLABSETTINGS_TOKENENDPOINT: "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token"
+      MM_GITLABSETTINGS_USERAPIENDPOINT: "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/userinfo"
     volumes:
       - mm_data:/mattermost/data
       - mm_logs:/mattermost/logs

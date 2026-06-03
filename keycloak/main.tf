@@ -55,6 +55,7 @@ data "template_file" "cloud_init" {
     KEYCLOAK_VERSION   = var.keycloak_version
     KEYCLOAK_ADMIN     = var.keycloak_admin_user
     KEYCLOAK_PASSWORD  = var.keycloak_admin_password
+    KEYCLOAK_HOSTNAME  = var.keycloak_hostname
   }
 }
 
@@ -62,22 +63,41 @@ resource "ovh_cloud_project_instance" "keycloak_vm" {
   service_name = var.ovh_project_id
   region       = var.region
   name         = "keycloak-vm"
-  
+
   flavor {
     flavor_id = var.instance_flavor
   }
 
   boot_from {
-    image_id =  var.instance_image
+    image_id = var.instance_image
   }
 
   ssh_key {
     name = var.ssh_key_name_keycloack
   }
   billing_period = "hourly"
-  user_data       = data.template_file.cloud_init.rendered
+  user_data      = data.template_file.cloud_init.rendered
 
   network {
     public = true
   }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+}
+
+locals {
+  keycloak_public_ipv4 = [
+    for addr in ovh_cloud_project_instance.keycloak_vm.addresses :
+    addr.ip if addr.version == 4
+  ][0]
+}
+
+resource "ovh_domain_zone_record" "keycloak_sso" {
+  zone      = var.domain
+  subdomain = "sso"
+  fieldtype = "A"
+  ttl       = 3600
+  target    = local.keycloak_public_ipv4
 }

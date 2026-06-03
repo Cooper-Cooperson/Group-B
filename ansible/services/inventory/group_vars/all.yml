@@ -2,3 +2,21 @@
 mm_db_password: "testpass"
 jicofo_auth_password: "testpass"
 jvb_auth_password: "testpass"
+
+# Keycloak SSO
+keycloak_url: "https://sso.suitit.tech"
+keycloak_realm: "suitit"
+
+# Portal oauth2-proxy (client: portal)
+portal_oidc_client_id: "portal"
+portal_oidc_client_secret: "2swQqDq0ElzWwTL8zGY34pi6QJ927AZI"
+portal_oauth2_cookie_secret: "YjjvoH6sSV1lq3QMuHrDDowQt7cIfQ7jkiaWQUKcHIE="
+
+# Mattermost GitLab OAuth (client: mattermost)
+mm_oidc_client_id: "mattermost"
+mm_oidc_client_secret: "IQemWXAJtSFwoX9gdj2tc7uDmsqhJZp1"
+
+# Jitsi oauth2-proxy (client: jitsi)
+jitsi_oidc_client_id: "jitsi"
+jitsi_oidc_client_secret: "HYaXV28P8cGuIonAfus5fZZEkRVIW1Fp"
+jitsi_oauth2_cookie_secret: "RDLVZDCgsrU7tHugwhHhgG1afJCJId3d6FyWyYoAGDs="

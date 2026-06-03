@@ -1,3 +1,8 @@
+variable "domain" {
+  description = "Root domain name managed in OVHcloud DNS (e.g., suitit.tech)"
+  type        = string
+}
+
 variable keycloak_admin_user {
   type = string
 }

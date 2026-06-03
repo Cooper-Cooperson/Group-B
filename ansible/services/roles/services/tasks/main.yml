@@ -41,6 +41,12 @@
     dest: /opt/services/jitsi/docker-compose.yml
     mode: '0644'
 
+- name: Write .env file for base services
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /opt/services/.env
+    mode: '0600'
+
 - name: Write .env file for Mattermost
   ansible.builtin.template:
     src: .env.j2
@@ -62,6 +68,7 @@
 - name: Start Caddy stack
   ansible.builtin.command:
     cmd: docker compose -f /opt/services/docker-compose.base.yml up -d
+    chdir: /opt/services
   register: caddy_up
   changed_when: "'Created' in caddy_up.stdout or 'Started' in caddy_up.stdout"
 

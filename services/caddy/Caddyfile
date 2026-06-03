@@ -12,8 +12,19 @@
 
 suitit.tech, www.suitit.tech {
 	import security_headers
-	root * /srv/portal
-	file_server
+
+	handle /oauth2/* {
+		reverse_proxy portal-oauth-proxy:4180
+	}
+
+	handle {
+		forward_auth portal-oauth-proxy:4180 {
+			uri /oauth2/auth
+			copy_headers X-Auth-Request-User X-Auth-Request-Email
+		}
+		root * /srv/portal
+		file_server
+	}
 }
 
 chat.suitit.tech {
@@ -32,9 +43,21 @@ meet.suitit.tech {
 		reverse_proxy prosody:5280
 	}
 
+	handle /oauth2/* {
+		reverse_proxy jitsi-oauth-proxy:4181
+	}
+
 	handle {
+		forward_auth jitsi-oauth-proxy:4181 {
+			uri /oauth2/auth
+			copy_headers X-Auth-Request-User X-Auth-Request-Email
+		}
 		reverse_proxy jitsi-web:80
 	}
+}
+
+auth.suitit.tech {
+	redir https://sso.suitit.tech{uri} permanent
 }
 
 mail.suitit.tech {
