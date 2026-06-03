@@ -8,15 +8,15 @@ keycloak_url: "https://sso.suitit.tech"
 keycloak_realm: "SuitIT"
 
 # Portal oauth2-proxy (client: portal)
-portal_oidc_client_id: "portal"
+portal_oidc_client_id: "Portal"
 portal_oidc_client_secret: "rGzfbUKlI83FORWUAufRPncLyUut9VN0"
 portal_oauth2_cookie_secret: "YjjvoH6sSV1lq3QMuHrDDowQt7cIfQ7jkiaWQUKcHIE="
 
 # Mattermost GitLab OAuth (client: mattermost)
-mm_oidc_client_id: "mattermost"
+mm_oidc_client_id: "openid mattermost"
 mm_oidc_client_secret: "bgkuteEhOQ2BjsQ14bNiVsirZoW1BqSN"
 
 # Jitsi oauth2-proxy (client: jitsi)
-jitsi_oidc_client_id: "jitsi"
+jitsi_oidc_client_id: "Jitsi"
 jitsi_oidc_client_secret: "DHMhOVwRqpwqYHHHRsHOcdlNVhhUeikz"
 jitsi_oauth2_cookie_secret: "RDLVZDCgsrU7tHugwhHhgG1afJCJId3d6FyWyYoAGDs="
