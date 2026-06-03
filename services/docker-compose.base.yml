@@ -7,6 +7,7 @@ services:
       - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./portal:/srv/portal:ro
       - caddy_data:/data
       - caddy_config:/config
     extra_hosts:

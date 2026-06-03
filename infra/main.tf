@@ -383,6 +383,22 @@ resource "ovh_domain_zone_record" "services" {
   target    = local.public_ipv4
 }
 
+resource "ovh_domain_zone_record" "apex" {
+  zone      = var.domain
+  subdomain = ""
+  fieldtype = "A"
+  ttl       = var.dns_ttl
+  target    = local.public_ipv4
+}
+
+resource "ovh_domain_zone_record" "www" {
+  zone      = var.domain
+  subdomain = "www"
+  fieldtype = "A"
+  ttl       = var.dns_ttl
+  target    = local.public_ipv4
+}
+
 /*
 =============================================================================
 SECTION 4: OBJECT STORAGE (Shared & Personal File Storage Backend)

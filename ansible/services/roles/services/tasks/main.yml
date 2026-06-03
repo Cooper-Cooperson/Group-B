@@ -9,6 +9,7 @@
     - /opt/services/caddy
     - /opt/services/mattermost
     - /opt/services/jitsi
+    - /opt/services/portal
 
 - name: Copy Caddy base compose file
   ansible.builtin.copy:
@@ -20,6 +21,12 @@
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../services/caddy/Caddyfile"
     dest: /opt/services/caddy/Caddyfile
+    mode: '0644'
+
+- name: Copy portal index page
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../services/portal/index.html"
+    dest: /opt/services/portal/index.html
     mode: '0644'
 
 - name: Copy Mattermost compose file

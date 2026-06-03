@@ -10,6 +10,12 @@
 	}
 }
 
+suitit.tech, www.suitit.tech {
+	import security_headers
+	root * /srv/portal
+	file_server
+}
+
 chat.suitit.tech {
 	import security_headers
 	reverse_proxy mattermost:8065
