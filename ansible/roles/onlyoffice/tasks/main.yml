@@ -1,0 +1,70 @@
+---
+# =============================================================================
+# ONLYOFFICE Document Server — Deployment Tasks
+# =============================================================================
+# Deploys the ONLYOFFICE Document Server via Docker Compose using the
+# community.docker.docker_compose_v2 module (requires community.docker >= 3.x).
+#
+# Prerequisites (handled by the 'docker' role, which runs first):
+#   - Docker Engine installed
+#   - Docker Compose plugin installed (docker-compose-plugin)
+#   - Docker service running
+#
+# Network requirement:
+#   The 'proxy-net' Docker network must already exist (created by the
+#   docker-compose.base.yml Caddy stack). If deploying ONLYOFFICE before
+#   Caddy, the network creation task below handles this.
+# =============================================================================
+
+- name: Ensure proxy-net Docker network exists
+  community.docker.docker_network:
+    name: proxy-net
+    driver: bridge
+    state: present
+
+- name: Create ONLYOFFICE install directory
+  ansible.builtin.file:
+    path: "{{ onlyoffice_install_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Template ONLYOFFICE Docker Compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ onlyoffice_install_path }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  register: onlyoffice_compose_file
+
+- name: Deploy ONLYOFFICE Document Server via Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ onlyoffice_install_path }}"
+    state: present
+    pull: policy
+  register: onlyoffice_deploy
+
+- name: Show ONLYOFFICE deployment result
+  ansible.builtin.debug:
+    var: onlyoffice_deploy
+    verbosity: 1
+
+- name: Wait for ONLYOFFICE to become healthy
+  ansible.builtin.uri:
+    url: "http://localhost:{{ onlyoffice_internal_port }}/healthcheck"
+    method: GET
+    return_content: yes
+    status_code: 200
+  register: onlyoffice_health
+  until: onlyoffice_health.status == 200
+  retries: 30
+  delay: 10
+  ignore_errors: yes
+
+- name: Report ONLYOFFICE health status
+  ansible.builtin.debug:
+    msg: >-
+      ONLYOFFICE Document Server health:
+      {{ 'HEALTHY' if onlyoffice_health.status == 200 else 'NOT YET READY (may need more time on first start)' }}

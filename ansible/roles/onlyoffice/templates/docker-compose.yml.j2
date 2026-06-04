@@ -1,0 +1,68 @@
+# =============================================================================
+# ONLYOFFICE Document Server — Docker Compose
+# =============================================================================
+# Managed by Ansible. Do not edit manually on the host.
+#
+# Architecture:
+#   Internet → Caddy (:443) → proxy-net → onlyoffice-documentserver (:{{ onlyoffice_internal_port }})
+#
+# Seafile Integration:
+#   JWT_ENABLED + JWT_SECRET must match Seafile's seahub_settings.py values.
+#   Seafile opens documents in an ONLYOFFICE iframe; all API calls between
+#   Seafile and ONLYOFFICE are signed with this shared JWT secret.
+#
+# Keycloak / SSO:
+#   User authentication is handled by Seafile (which integrates with Keycloak
+#   via OIDC at {{ keycloak_oidc_issuer }}).
+#   ONLYOFFICE itself does not authenticate end-users — it trusts the JWT
+#   token from Seafile for each editing session.
+# =============================================================================
+
+services:
+  onlyoffice-documentserver:
+    image: {{ onlyoffice_image }}
+    container_name: onlyoffice-documentserver
+    restart: unless-stopped
+    environment:
+      # -- JWT Authentication (Seafile ↔ ONLYOFFICE) -------------------------
+      # These must match the values in Seafile's seahub_settings.py:
+      #   ONLYOFFICE_JWT_SECRET = '{{ onlyoffice_jwt_secret }}'
+      JWT_ENABLED: "{{ onlyoffice_jwt_enabled }}"
+      JWT_SECRET: "{{ onlyoffice_jwt_secret }}"
+      JWT_HEADER: Authorization
+      JWT_IN_BODY: "true"
+
+      # -- Listener port (internal only, not exposed to host) -----------------
+      DS_PORT: "{{ onlyoffice_internal_port }}"
+
+      # -- Logging & performance tuning for 50-100 users ----------------------
+      WOPI_ENABLED: "false"
+
+      # -- Timezone -----------------------------------------------------------
+      TZ: {{ onlyoffice_tz }}
+
+    volumes:
+      # Persistent storage for document cache, conversion output, and config
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_logs:/var/log/onlyoffice
+      - onlyoffice_lib:/var/lib/onlyoffice
+      - onlyoffice_fonts:/usr/share/fonts/truetype/custom
+
+    networks:
+      - proxy-net
+
+    # -------------------------------------------------------------------------
+    # No host port bindings!
+    # Caddy reverse-proxies office.suitit.nl → onlyoffice-documentserver:8083
+    # via the shared proxy-net Docker network.
+    # -------------------------------------------------------------------------
+
+volumes:
+  onlyoffice_data:
+  onlyoffice_logs:
+  onlyoffice_lib:
+  onlyoffice_fonts:
+
+networks:
+  proxy-net:
+    external: true

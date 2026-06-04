@@ -5,3 +5,10 @@
   roles:
     - docker
     - mailcow
+
+- name: Deploy ONLYOFFICE Document Server
+  hosts: appserver
+  become: yes
+  roles:
+    - docker
+    - onlyoffice

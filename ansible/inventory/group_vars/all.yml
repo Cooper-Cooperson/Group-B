@@ -4,3 +4,17 @@
 mailcow_hostname: mail.suitit.tech  # REPLACE with your actual domain, e.g., mail.suitit.tech
 mailcow_tz: Europe/Amsterdam
 mailcow_install_path: /opt/mailcow-dockerized
+
+# =============================================================================
+# Global Variables for ONLYOFFICE Document Server
+# =============================================================================
+# The JWT secret below is the critical integration point between ONLYOFFICE
+# and Seafile. Both services MUST use the exact same value.
+#
+# For production, encrypt with Ansible Vault:
+#   ansible-vault encrypt_string 'your-strong-secret' --name 'onlyoffice_jwt_secret'
+# =============================================================================
+
+onlyoffice_domain: office.suitit.nl
+onlyoffice_jwt_secret: "Ge5ZjCnz0shUsZXQEsv8qqtHopOFcZSxz9wMqUF-zvE"  # TODO: vault-encrypt before production
+onlyoffice_install_path: /opt/onlyoffice
