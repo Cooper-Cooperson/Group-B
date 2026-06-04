@@ -53,7 +53,7 @@ mail.suitit.tech {
 	}
 }
 
-office.suitit.nl {
+files.suitit.nl {
 	# ONLYOFFICE Document Server — real-time collaborative editing
 	# WebSocket upgrade is required for live co-editing sessions
 	reverse_proxy onlyoffice-documentserver:8083 {
