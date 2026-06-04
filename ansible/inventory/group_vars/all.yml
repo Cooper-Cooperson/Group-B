@@ -18,3 +18,10 @@ mailcow_install_path: /opt/mailcow-dockerized
 onlyoffice_domain: files.suitit.tech
 onlyoffice_jwt_secret: "Ge5ZjCnz0shUsZXQEsv8qqtHopOFcZSxz9wMqUF-zvE"  # TODO: vault-encrypt before production
 onlyoffice_install_path: /opt/onlyoffice
+
+# Keycloak SSO — oauth2-proxy for OnlyOffice
+# Create client "OnlyOffice" in Keycloak realm SuitIT with redirect URI:
+#   https://files.suitit.tech/oauth2/callback
+onlyoffice_oidc_client_id: "OnlyOffice"
+onlyoffice_oidc_client_secret: "1GzEqXvRoTZfMw5j8LSYxBDVc74urTha"  # TODO: vault-encrypt before production
+onlyoffice_oauth2_cookie_secret: "+7NOSk8bfyEfRyNwuRJwhAIBBW9RaqlEQJRDRK+PHD4="  # TODO: vault-encrypt before production

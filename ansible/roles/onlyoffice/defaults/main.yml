@@ -15,7 +15,7 @@ onlyoffice_install_path: /opt/onlyoffice
 onlyoffice_internal_port: 8083
 
 # -- Domain ------------------------------------------------------------------
-onlyoffice_domain: office.suitit.nl
+onlyoffice_domain: files.suitit.tech
 
 # -- JWT / Seafile Integration -----------------------------------------------
 # The JWT secret is shared between ONLYOFFICE and Seafile.  Both services
@@ -30,22 +30,25 @@ onlyoffice_domain: office.suitit.nl
 onlyoffice_jwt_enabled: "true"
 onlyoffice_jwt_secret: "Ge5ZjCnz0shUsZXQEsv8qqtHopOFcZSxz9wMqUF-zvE"
 
-# -- Keycloak / OIDC (documentation only) ------------------------------------
-# The ONLYOFFICE Document Server (Community Edition) does NOT handle user
-# authentication itself.  Authentication is managed by the frontend
-# application that embeds the editor (in our case, Seafile).
+# -- Keycloak / oauth2-proxy SSO ---------------------------------------------
+# An oauth2-proxy sidecar gates access to OnlyOffice behind Keycloak OIDC.
+# Auth flow:
+#   1. Browser hits files.suitit.tech → Caddy → onlyoffice-oauth-proxy
+#   2. oauth2-proxy redirects unauthenticated users to Keycloak
+#   3. After login, requests are forwarded to onlyoffice-documentserver
 #
-# The actual auth flow is:
-#   1. User visits files.suitit.nl (Seafile)
-#   2. Seafile redirects unauthenticated users to Keycloak (OIDC)
-#   3. Keycloak authenticates the user and returns a token to Seafile
-#   4. Seafile opens the document in an ONLYOFFICE iframe
-#   5. Seafile ↔ ONLYOFFICE communication is secured by the JWT secret above
+# Prerequisites — create a Keycloak client in the SuitIT realm:
+#   Client ID:            OnlyOffice
+#   Valid Redirect URIs:  https://files.suitit.tech/oauth2/callback
+#   Web Origins:          https://files.suitit.tech
 #
-# These variables are kept here for reference / future Enterprise Edition use:
-keycloak_base_url: "https://auth.suitit.nl"
-keycloak_realm: suitit
-keycloak_oidc_issuer: "{{ keycloak_base_url }}/realms/{{ keycloak_realm }}"
+# Generate cookie secret: openssl rand -base64 32
+# Vault-encrypt secrets:  ansible-vault encrypt_string 'value' --name 'var'
+keycloak_url: "https://sso.suitit.tech"
+keycloak_realm: "SuitIT"
+onlyoffice_oidc_client_id: "OnlyOffice"
+onlyoffice_oidc_client_secret: "CHANGE_ME"   # TODO: vault-encrypt before production
+onlyoffice_oauth2_cookie_secret: "CHANGE_ME"  # TODO: openssl rand -base64 32, then vault-encrypt
 
 # -- Container image ---------------------------------------------------------
 onlyoffice_image: "onlyoffice/documentserver:latest"

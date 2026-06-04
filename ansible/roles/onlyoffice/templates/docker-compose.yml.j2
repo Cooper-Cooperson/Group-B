@@ -57,6 +57,27 @@ services:
     # via the shared proxy-net Docker network.
     # -------------------------------------------------------------------------
 
+  onlyoffice-oauth-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    container_name: onlyoffice-oauth-proxy
+    restart: unless-stopped
+    environment:
+      OAUTH2_PROXY_PROVIDER: keycloak-oidc
+      OAUTH2_PROXY_OIDC_ISSUER_URL: "{{ keycloak_url }}/realms/{{ keycloak_realm }}"
+      OAUTH2_PROXY_CLIENT_ID: "{{ onlyoffice_oidc_client_id }}"
+      OAUTH2_PROXY_CLIENT_SECRET: "{{ onlyoffice_oidc_client_secret }}"
+      OAUTH2_PROXY_COOKIE_SECRET: "{{ onlyoffice_oauth2_cookie_secret }}"
+      OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4182"
+      OAUTH2_PROXY_REDIRECT_URL: "https://{{ onlyoffice_domain }}/oauth2/callback"
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_UPSTREAMS: "http://onlyoffice-documentserver:{{ onlyoffice_internal_port }}"
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
+      OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
+    networks:
+      - proxy-net
+
 volumes:
   onlyoffice_data:
   onlyoffice_logs:
