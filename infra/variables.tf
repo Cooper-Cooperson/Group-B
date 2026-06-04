@@ -160,11 +160,11 @@ variable "subdomains" {
   type        = map(string)
   default = {
     "auth"   = "Keycloak — Identity & Access Management (IAM)"
-    #"files"  = "Nextcloud — File Storage & Collaboration"
+    "files"  = "Nextcloud — File Storage & Collaboration"
     "mail"   = "Mailcow — Email Server (SMTP/IMAP)"
     "chat"   = "Mattermost — Team Chat & Messaging"
     "meet"   = "Jitsi Meet — Video Conferencing"
-    "files" = "ONLYOFFICE — Document Editing"
+    "office" = "ONLYOFFICE — Document Editing"
   }
 }
 
