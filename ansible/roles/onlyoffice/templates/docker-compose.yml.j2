@@ -32,8 +32,6 @@ services:
       JWT_HEADER: Authorization
       JWT_IN_BODY: "true"
 
-      # -- Listener port (internal only, not exposed to host) -----------------
-      DS_PORT: "{{ onlyoffice_internal_port }}"
 
       # -- Logging & performance tuning for 50-100 users ----------------------
       WOPI_ENABLED: "false"
@@ -70,7 +68,7 @@ services:
       OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4182"
       OAUTH2_PROXY_REDIRECT_URL: "https://{{ onlyoffice_domain }}/oauth2/callback"
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
-      OAUTH2_PROXY_UPSTREAMS: "http://onlyoffice-documentserver:{{ onlyoffice_internal_port }}"
+      OAUTH2_PROXY_UPSTREAMS: "http://onlyoffice-documentserver:80"
       OAUTH2_PROXY_COOKIE_SECURE: "true"
       OAUTH2_PROXY_REVERSE_PROXY: "true"
       OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
