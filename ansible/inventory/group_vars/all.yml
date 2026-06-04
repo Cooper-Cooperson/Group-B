@@ -15,7 +15,7 @@ mailcow_install_path: /opt/mailcow-dockerized
 #   ansible-vault encrypt_string 'your-strong-secret' --name 'onlyoffice_jwt_secret'
 # =============================================================================
 
-onlyoffice_domain: office.suitit.tech
+onlyoffice_domain: files.suitit.tech
 onlyoffice_jwt_secret: "Ge5ZjCnz0shUsZXQEsv8qqtHopOFcZSxz9wMqUF-zvE"  # TODO: vault-encrypt before production
 onlyoffice_install_path: /opt/onlyoffice
 
