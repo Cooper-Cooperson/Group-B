@@ -1,6 +1,6 @@
 ---
 # Global Variables for Mailcow Deployment
 
-mailcow_hostname: mail.yourdomain.com  # REPLACE with your actual domain, e.g., mail.suitit.tech
+mailcow_hostname: mail.suitit.tech  # REPLACE with your actual domain, e.g., mail.suitit.tech
 mailcow_tz: Europe/Amsterdam
 mailcow_install_path: /opt/mailcow-dockerized
