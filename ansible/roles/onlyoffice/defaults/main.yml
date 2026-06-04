@@ -12,7 +12,7 @@ onlyoffice_install_path: /opt/onlyoffice
 # -- Networking --------------------------------------------------------------
 # Internal port the Document Server listens on (Caddy proxies to this).
 # No host ports are exposed; traffic flows: Caddy (443) → proxy-net → 8083.
-onlyoffice_internal_port: 8083
+onlyoffice_internal_port: 80
 
 # -- Domain ------------------------------------------------------------------
 onlyoffice_domain: files.suitit.tech
