@@ -12,3 +12,9 @@
   roles:
     - docker
     - onlyoffice
+
+- name: Deploy Seafile Community Edition
+  hosts: appserver
+  become: yes
+  roles:
+    - seafile

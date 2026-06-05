@@ -1,0 +1,33 @@
+---
+# =============================================================================
+# Seafile Community Edition — Default Variables
+# =============================================================================
+# Override sensitive values in inventory/group_vars/all.yml or Ansible Vault.
+# =============================================================================
+
+# -- Deployment paths --------------------------------------------------------
+seafile_install_path: /opt/seafile
+
+# -- Domain ------------------------------------------------------------------
+seafile_domain: seafile.suitit.tech
+
+# -- Container image ---------------------------------------------------------
+seafile_image: seafileltd/seafile-mc:11.0-latest
+
+# -- Timezone ----------------------------------------------------------------
+seafile_tz: Europe/Amsterdam
+
+# -- Admin account (created on first run) ------------------------------------
+seafile_admin_email: "robbefontys@gmail.com"
+seafile_admin_password: "CHANGE_ME"   # TODO: vault-encrypt before production
+
+# -- Database ----------------------------------------------------------------
+seafile_db_root_password: "CHANGE_ME" # TODO: vault-encrypt before production
+
+# -- Keycloak OIDC -----------------------------------------------------------
+# Create a client "Seafile" in Keycloak realm SuitIT:
+#   Client ID:            Seafile
+#   Valid Redirect URIs:  https://seafile.suitit.tech/oauth/callback/
+#   Web Origins:          https://seafile.suitit.tech
+seafile_oidc_client_id: "Seafile"
+seafile_oidc_client_secret: "CHANGE_ME"  # TODO: vault-encrypt before production

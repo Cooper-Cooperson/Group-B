@@ -159,11 +159,12 @@ variable "subdomains" {
   description = "Map of service subdomains to their description (used for DNS A-records)"
   type        = map(string)
   default = {
-    "auth"   = "Keycloak — Identity & Access Management (IAM)"
-    "mail"   = "Mailcow — Email Server (SMTP/IMAP)"
-    "chat"   = "Mattermost — Team Chat & Messaging"
-    "meet"   = "Jitsi Meet — Video Conferencing"
-    "files"  = "ONLYOFFICE — Document Editing"
+    "auth"    = "Keycloak — Identity & Access Management (IAM)"
+    "mail"    = "Mailcow — Email Server (SMTP/IMAP)"
+    "chat"    = "Mattermost — Team Chat & Messaging"
+    "meet"    = "Jitsi Meet — Video Conferencing"
+    "files"   = "ONLYOFFICE — Document Editing"
+    "seafile" = "Seafile — File Storage & Collaboration"
   }
 }
 

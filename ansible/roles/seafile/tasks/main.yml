@@ -1,0 +1,92 @@
+---
+# =============================================================================
+# Seafile Community Edition — Deployment Tasks
+# =============================================================================
+
+- name: Ensure proxy-net Docker network exists
+  community.docker.docker_network:
+    name: proxy-net
+    driver: bridge
+    state: present
+
+- name: Create Seafile install directory
+  ansible.builtin.file:
+    path: "{{ seafile_install_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Template Seafile Docker Compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ seafile_install_path }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy Seafile stack via Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ seafile_install_path }}"
+    state: present
+    pull: policy
+  register: seafile_deploy
+
+- name: Wait for Seafile to fully initialize (seahub_settings.py created)
+  ansible.builtin.command:
+    cmd: docker exec seafile test -f /shared/seafile/conf/seahub_settings.py
+  register: seafile_init_check
+  until: seafile_init_check.rc == 0
+  retries: 40
+  delay: 15
+  changed_when: false
+
+- name: Check if OIDC settings already applied (idempotency guard)
+  ansible.builtin.command:
+    cmd: docker exec seafile grep -q "ENABLE_OAUTH" /shared/seafile/conf/seahub_settings.py
+  register: oidc_already_applied
+  failed_when: false
+  changed_when: false
+
+- name: Template OIDC + OnlyOffice settings block to host
+  ansible.builtin.template:
+    src: seahub_settings.py.j2
+    dest: "{{ seafile_install_path }}/seahub_settings_custom.py"
+    owner: root
+    group: root
+    mode: '0644'
+  when: oidc_already_applied.rc != 0
+
+- name: Copy custom settings into Seafile container
+  ansible.builtin.command:
+    cmd: docker cp {{ seafile_install_path }}/seahub_settings_custom.py seafile:/tmp/seahub_settings_custom.py
+  when: oidc_already_applied.rc != 0
+  changed_when: true
+
+- name: Append custom settings to seahub_settings.py inside container
+  ansible.builtin.command:
+    cmd: docker exec seafile sh -c "cat /tmp/seahub_settings_custom.py >> /shared/seafile/conf/seahub_settings.py"
+  when: oidc_already_applied.rc != 0
+  changed_when: true
+
+- name: Restart Seafile container to apply custom settings
+  community.docker.docker_container:
+    name: seafile
+    state: started
+    restart: true
+  when: oidc_already_applied.rc != 0
+
+- name: Wait for Seahub to respond after restart
+  ansible.builtin.command:
+    cmd: docker exec seafile curl -sf http://localhost/api2/ping/
+  register: seahub_health
+  until: seahub_health.rc == 0
+  retries: 20
+  delay: 10
+  changed_when: false
+  ignore_errors: true
+
+- name: Report Seafile health
+  ansible.builtin.debug:
+    msg: >-
+      Seafile status: {{ 'READY' if seahub_health.rc == 0 else 'NOT YET READY — may need more time on first run' }}

@@ -56,15 +56,25 @@ mail.suitit.tech {
 files.suitit.tech {
 	import security_headers
 
-	handle /oauth2/* {
-		reverse_proxy onlyoffice-oauth-proxy:4182
+	# oauth2-proxy removed — ONLYOFFICE is now integrated with Seafile.
+	# Security is provided by the shared JWT secret (not oauth2-proxy).
+	reverse_proxy onlyoffice-documentserver:80 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}
+
+seafile.suitit.tech {
+	import security_headers
+
+	# Allow large file uploads (adjust to your storage plan)
+	request_body {
+		max_size 10GB
 	}
 
-	handle {
-		reverse_proxy onlyoffice-oauth-proxy:4182 {
-			header_up X-Forwarded-Proto {scheme}
-			header_up X-Forwarded-Host {host}
-		}
+	reverse_proxy seafile:80 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
 	}
 }
 

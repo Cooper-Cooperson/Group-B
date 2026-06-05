@@ -1,0 +1,71 @@
+# =============================================================================
+# Seafile Community Edition — Docker Compose
+# =============================================================================
+# Managed by Ansible. Do not edit manually on the host.
+#
+# Architecture:
+#   Internet → Caddy (:443) → proxy-net → seafile (:80)
+#
+# Networks:
+#   seafile-net  — internal: db + memcached + seafile (no external access)
+#   proxy-net    — external: Caddy reaches seafile on port 80
+#
+# SSO:
+#   Keycloak OIDC at {{ keycloak_url }}/realms/{{ keycloak_realm }}
+#   Settings injected into /shared/seafile/conf/seahub_settings.py by Ansible.
+#
+# OnlyOffice Integration:
+#   JWT secret must match onlyoffice_jwt_secret in group_vars.
+#   Seafile serves ONLYOFFICE iframe; browser talks directly to files.suitit.tech.
+# =============================================================================
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: seafile-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "{{ seafile_db_root_password }}"
+      MYSQL_LOG_CONSOLE: "true"
+    volumes:
+      - seafile_db:/var/lib/mysql
+    networks:
+      - seafile-net
+
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: seafile-memcached
+    restart: unless-stopped
+    networks:
+      - seafile-net
+
+  seafile:
+    image: {{ seafile_image }}
+    container_name: seafile
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_ROOT_PASSWD: "{{ seafile_db_root_password }}"
+      SEAFILE_ADMIN_EMAIL: "{{ seafile_admin_email }}"
+      SEAFILE_ADMIN_PASSWORD: "{{ seafile_admin_password }}"
+      SEAFILE_SERVER_HOSTNAME: "{{ seafile_domain }}"
+      SEAFILE_SERVER_LETSENCRYPT: "false"
+      TIME_ZONE: "{{ seafile_tz }}"
+    volumes:
+      - seafile_data:/shared
+    depends_on:
+      - db
+      - memcached
+    networks:
+      - seafile-net
+      - proxy-net
+
+volumes:
+  seafile_db:
+  seafile_data:
+
+networks:
+  seafile-net:
+    driver: bridge
+  proxy-net:
+    external: true

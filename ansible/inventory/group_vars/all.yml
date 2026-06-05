@@ -25,3 +25,17 @@ onlyoffice_install_path: /opt/onlyoffice
 onlyoffice_oidc_client_id: "OnlyOffice"
 onlyoffice_oidc_client_secret: "1GzEqXvRoTZfMw5j8LSYxBDVc74urTha"  # TODO: vault-encrypt before production
 onlyoffice_oauth2_cookie_secret: "+7NOSk8bfyEfRyNwuRJwhAIBBW9RaqlEQJRDRK+PHD4="  # TODO: vault-encrypt before production
+
+# =============================================================================
+# Seafile Community Edition
+# =============================================================================
+seafile_domain: seafile.suitit.tech
+seafile_admin_email: "robbefontys@gmail.com"
+seafile_admin_password: "Groupb123!"
+seafile_db_root_password: "Groupb123!"
+
+# Keycloak OIDC — create client "Seafile" in Keycloak realm SuitIT:
+#   Valid Redirect URIs: https://seafile.suitit.tech/oauth/callback/
+#   Web Origins:         https://seafile.suitit.tech
+seafile_oidc_client_id: "Seafile"
+seafile_oidc_client_secret: "DBt82rvpixEV2ipxYt0nFqmy3STp9xxh"

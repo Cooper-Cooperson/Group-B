@@ -1,0 +1,33 @@
+# =============================================================================
+# Seafile Custom Settings — Managed by Ansible
+# Appended to /shared/seafile/conf/seahub_settings.py on first deploy.
+# =============================================================================
+
+# -- Keycloak OIDC SSO --------------------------------------------------------
+ENABLE_OAUTH = True
+OAUTH_ENABLE_INSECURE_TRANSPORT = False
+OAUTH_CLIENT_ID = "{{ seafile_oidc_client_id }}"
+OAUTH_CLIENT_SECRET = "{{ seafile_oidc_client_secret }}"
+OAUTH_REDIRECT_URL = "https://{{ seafile_domain }}/oauth/callback/"
+OAUTH_PROVIDER_DOMAIN = "{{ keycloak_url | regex_replace('https?://', '') }}"
+OAUTH_AUTHORIZATION_URL = "{{ keycloak_url }}/realms/{{ keycloak_realm }}/protocol/openid-connect/auth"
+OAUTH_TOKEN_URL = "{{ keycloak_url }}/realms/{{ keycloak_realm }}/protocol/openid-connect/token"
+OAUTH_USER_INFO_URL = "{{ keycloak_url }}/realms/{{ keycloak_realm }}/protocol/openid-connect/userinfo"
+OAUTH_SCOPE = ["openid", "profile", "email"]
+OAUTH_ATTRIBUTE_MAP = {
+    "email": (True, "email"),
+    "name": (False, "name"),
+    "given_name": (False, "givenName"),
+    "family_name": (False, "familyName"),
+}
+OAUTH_CREATE_UNKNOWN_USER = True
+OAUTH_ACTIVATE_USER_AFTER_CREATION = True
+
+# -- OnlyOffice Integration ---------------------------------------------------
+# ONLYOFFICE is at files.suitit.tech (JWT-secured, oauth2-proxy removed).
+ENABLE_ONLYOFFICE = True
+ONLYOFFICE_APIJS_URL = "https://{{ onlyoffice_domain }}/web-apps/apps/api/documents/api.js"
+ONLYOFFICE_FILE_EXTENSION = ('doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'odt', 'ods', 'odp', 'csv', 'txt')
+ONLYOFFICE_EDIT_FILE_EXTENSION = ('docx', 'pptx', 'xlsx')
+VERIFY_ONLYOFFICE_CERTIFICATE = True
+ONLYOFFICE_JWT_SECRET = "{{ onlyoffice_jwt_secret }}"
