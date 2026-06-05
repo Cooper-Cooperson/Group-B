@@ -13,7 +13,7 @@ portal_oidc_client_secret: "rGzfbUKlI83FORWUAufRPncLyUut9VN0"
 portal_oauth2_cookie_secret: "YjjvoH6sSV1lq3QMuHrDDowQt7cIfQ7jkiaWQUKcHIE="
 
 # Mattermost GitLab OAuth (client: mattermost)
-mm_oidc_client_id: "openid mattermost"
+mm_oidc_client_id: "mattermost"
 mm_oidc_client_secret: "bgkuteEhOQ2BjsQ14bNiVsirZoW1BqSN"
 
 # Jitsi oauth2-proxy (client: jitsi)
